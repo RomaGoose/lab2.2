@@ -22,12 +22,11 @@ TEST_CASE("dyn_arr constructors", "[dyn_arr]"){
         dynamic_array<int> darr_full(arr, 3);
 
         REQUIRE(darr_full.get_size() == 3);
-
-        int arr_full[] = {
-            darr_full.get(0),
-            darr_full.get(1),
-            darr_full.get(2)
-        };
+        size_t i = 0;
+        int arr_full[3];
+        for(auto el: darr_full){
+            arr_full[i++] = el;
+        }
 
         CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(arr_full)));
     }
@@ -39,19 +38,20 @@ TEST_CASE("dyn_arr constructors", "[dyn_arr]"){
         REQUIRE(darr_copy.get_size() == 3);
         REQUIRE(darr_full.get_size() == 3);
 
-        int arr_copy[] = {
-            darr_copy.get(0),
-            darr_copy.get(1),
-            darr_copy.get(2)
-        };
+        
+        size_t i = 0;
+        int arr_copy[3];
+        for(auto el: darr_copy){
+            arr_copy[i++] = el;
+        }
 
         darr_full.set(0, 342);
         darr_full.set(2, 4);
-        int arr_copied_from[] = {
-            darr_full.get(0),
-            darr_full.get(1),
-            darr_full.get(2)
-        };
+        i = 0;
+        int arr_copied_from[3];
+        for(auto el: darr_full){
+            arr_copied_from[i++] = el;
+        }
         int new_arr[] = {342, 2, 4};
 
         CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(arr_copy)));
@@ -72,18 +72,19 @@ TEST_CASE("dyn_arr opertor=", "[dyn_arr]"){
         REQUIRE(darr_copy.get_size() == 3);
         REQUIRE(darr.get_size() == 3);
 
-        float arr_copy[] = {
-            darr_copy.get(0),
-            darr_copy.get(1),
-            darr_copy.get(2)
-        };
+        
+        size_t i = 0;
+        float arr_copy[3];
+        for(auto el: darr_copy){
+            arr_copy[i++] = el;
+        }
 
         darr.set(0, -2);
-        float arr_copied_from[] = {
-            darr.get(0),
-            darr.get(1),
-            darr.get(2)
-        };
+        i = 0;
+        float arr_copied_from[3];
+        for(auto el: darr){
+            arr_copied_from[i++] = el;
+        }
         float new_arr[] = {-2, arr[1], arr[2]};
 
         CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(arr_copy)));
@@ -116,9 +117,11 @@ TEST_CASE("dyn_arr set", "[dyn_arr]"){
     CHECK(darr.get(1) == new_val);
 }
 
-TEST_CASE("dyn_arr get/set exceptions", "[dyn_arr][exceptions]"){
+TEST_CASE("dyn_arr get/set/[] exceptions", "[dyn_arr][exceptions]"){
     int arr[] = {1,3,3,7};
     dynamic_array<int> darr(arr, 4);
+    const dynamic_array<int>& darrref = darr;
+    int a;
 
     SECTION("get out_of_range"){
         CHECK_THROWS_AS(darr.get(4), std::out_of_range);
@@ -127,6 +130,14 @@ TEST_CASE("dyn_arr get/set exceptions", "[dyn_arr][exceptions]"){
     SECTION("set out_of_range"){
         CHECK_THROWS_AS(darr.set(4, 123), std::out_of_range);
         CHECK_THROWS_AS(darr.set(-1, 123), std::out_of_range);
+    }
+    SECTION("operator[] out_of_range"){
+        CHECK_THROWS_AS(darr[4] = 123, std::out_of_range);
+        CHECK_THROWS_AS(darr[-1] = 123, std::out_of_range);
+        CHECK_THROWS_AS(a = darr[4], std::out_of_range);
+        CHECK_THROWS_AS(a = darr[-1], std::out_of_range);
+        CHECK_THROWS_AS(a = darrref[4], std::out_of_range);
+        CHECK_THROWS_AS(a = darrref[-1], std::out_of_range);
     }
 }
 
@@ -167,5 +178,30 @@ TEST_CASE("dyn_arr resize", "[dyn_arr]"){
         CHECK(darr.get(1) == arr[1]);        
         CHECK(darr.get(2) == arr[2]);        
         CHECK(darr.get(3) == arr[3]);  
+    }
+}
+
+TEST_CASE("dyna_arr operator[]", "[dyn_arr]"){
+    char arr[] = {1,2,3,4};
+    dynamic_array<char> darr(arr, 4);
+    const auto& crdarr = darr;
+
+    SECTION("read-only"){
+        CHECK(crdarr[0]==1);
+        CHECK(crdarr[1]==2);
+        CHECK(crdarr[3]==4);
+    }
+    SECTION("rw"){
+        CHECK(darr[0] == 1);
+        CHECK(darr[1] == 2);
+        CHECK(darr[3] == 4);
+
+        darr[0] = 'p';
+        darr[1] = 'q';
+        darr[3] = 'r';
+
+        CHECK(darr[0] == 'p');
+        CHECK(darr[1] == 'q');
+        CHECK(darr[3] == 'r');
     }
 }
