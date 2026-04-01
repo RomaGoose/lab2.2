@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdlib>
+#include <initializer_list>
 #include <memory>
 #include <stdexcept>
 #include <utility>
@@ -56,6 +57,7 @@ class linked_list{
         linked_list();
         linked_list(T* items, size_t size);
         linked_list(const linked_list<T>& other);
+        linked_list(std::initializer_list<T> init_list);
 
         ~linked_list() = default;
 
@@ -109,6 +111,13 @@ linked_list<T>::linked_list(const linked_list<T>& other) : size(0){
         append(el);
     }
 };
+template<class T> 
+linked_list<T>::linked_list(std::initializer_list<T> init_list) : size(0){
+    for(auto el: init_list){
+        append(el);
+    }
+};
+
 
 
 template<class T> 

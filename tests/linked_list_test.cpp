@@ -90,6 +90,15 @@ TEST_CASE("linked_list constructor", "[linked_list]"){
 
         CHECK(empty_copy.get_size() == 0);
     }
+
+    SECTION("intializer list"){
+        int arr[] = {1,2,3,4,5};
+        linked_list<int> list(arr, 5);
+
+        REQUIRE(list.get_size()==5);
+
+        CHECK(operator==(list, {1,2,3,4,5}));
+    }
 }
 
 TEST_CASE("linked_list opertor=", "[linked_list]"){

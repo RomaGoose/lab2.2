@@ -1,4 +1,5 @@
 #include "dynamic_array.hpp"
+#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <cstddef>
 #include <iterator>
@@ -56,6 +57,14 @@ TEST_CASE("dyn_arr constructors", "[dyn_arr]"){
 
         CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(arr_copy)));
         CHECK(std::equal(std::begin(new_arr), std::end(new_arr), std::begin(arr_copied_from)));
+    }
+
+    SECTION("initializer list"){
+        dynamic_array<int> darr = {1,2,3,4};
+        int check_arr[] = {1,2,3,4};
+
+        // CHECK(std::equal(std::begin({1,2,3,4}), std::end({1,2,3,4}), darr.begin()));
+        CHECK(std::equal(std::begin(check_arr), std::end(check_arr), darr.begin()));
     }
 }
 

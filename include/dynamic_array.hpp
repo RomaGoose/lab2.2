@@ -1,5 +1,7 @@
 #include <cstddef>
 #include <algorithm>
+#include <initializer_list>
+#include <iterator>
 #include <stdexcept>
 
 template <class T>
@@ -11,6 +13,7 @@ class dynamic_array {
         dynamic_array(size_t size);
         dynamic_array(T* items_ptr, size_t size);
         dynamic_array(const dynamic_array<T>& other);
+        dynamic_array(std::initializer_list<T>);
 
         ~dynamic_array();
 
@@ -47,6 +50,10 @@ template <class T>
 dynamic_array<T>::dynamic_array(const dynamic_array<T>& other) : items(new T[other.size]), size(other.size) {
     std::copy(other.items, other.items + size, items);
 }
+template <class T>
+dynamic_array<T>::dynamic_array(std::initializer_list<T> init_list) : items(new T[init_list.size()]), size(init_list.size()){
+    std::copy(std::begin(init_list), std::end(init_list), items);
+};
 
 
 template <class T>
