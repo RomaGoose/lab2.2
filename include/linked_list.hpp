@@ -158,10 +158,10 @@ T linked_list<T>::get_last() {
     return tail.lock()->value;
 };
 template<class T>
-std::shared_ptr<typename linked_list<T>::node> get_node(size_t index) {
-    if (index >= linked_list<T>::size) throw std::out_of_range("index out of range");
-    if (index == 0) return linked_list<T>::head;
-    typename linked_list<T>::node* cur = linked_list<T>::head.get();
+std::shared_ptr<typename linked_list<T>::node> linked_list<T>::get_node(size_t index) {
+    if (index >= size) throw std::out_of_range("index out of range");
+    if (index == 0) return head;
+    node* cur = head.get();
     for(; index > 1; --index) 
         cur = cur->next.get();
     return cur->next;
