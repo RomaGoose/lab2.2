@@ -10,11 +10,10 @@
 
 
 template<class T>
-static T* to_array(linked_list<T>& list){
-    size_t size = list.get_size();
+static T* to_array(const linked_list<T>& list){
+    size_t size = list.size();
     auto arr = new T[size];
     auto it = list.begin();
-
     for(size_t i = 0; it!=list.end(); ++i, ++it){
         arr[i] = *it;
     }
@@ -22,7 +21,7 @@ static T* to_array(linked_list<T>& list){
 }
 template<class T>
 static bool operator==(linked_list<T>& list, std::initializer_list<T> arr){
-    if(arr.size() != list.get_size()) return false;
+    if(arr.size() != list.size()) return false;
     return std::equal(std::begin(arr), std::end(arr), list.begin());
 }
 template<class T>
@@ -41,12 +40,12 @@ TEST_CASE("linked_list constructor", "[linked_list]"){
     SECTION("default constructor"){
         linked_list<int> list;
 
-        CHECK(list.get_size() == 0);
+        CHECK(list.size() == 0);
     }
 
     SECTION("full constructor"){
         linked_list<int> list(arr, 5);
-        size_t size = list.get_size();
+        size_t size = list.size();
         
         REQUIRE(size == 5);
 
@@ -56,7 +55,7 @@ TEST_CASE("linked_list constructor", "[linked_list]"){
     }
     SECTION("full constructor (empty case)"){
         linked_list<int> list(arr, 0);
-        size_t size = list.get_size();
+        size_t size = list.size();
         
         REQUIRE(size == 0);
 
@@ -68,13 +67,14 @@ TEST_CASE("linked_list constructor", "[linked_list]"){
     SECTION("copy constructor"){
         linked_list<int> list(arr, 5);
         linked_list<int> copy_list(list);
-        size_t size = copy_list.get_size();
+        size_t size = copy_list.size();
 
         list.insert_at(2, 5);
-        int new_arr[] = {arr[0], arr[1], 5, arr[2], arr[3], arr[4]};
+        list.at(3) = 123;
+        int new_arr[] = {arr[0], arr[1], 5, 123, arr[3], arr[4]};
         
         REQUIRE(size == 5);
-        REQUIRE(list.get_size() == 6);
+        REQUIRE(list.size() == 6);
 
         int* check_arr = to_array(copy_list);
         int* arr_copied_from = to_array(list);
@@ -88,14 +88,14 @@ TEST_CASE("linked_list constructor", "[linked_list]"){
         linked_list<int> list;
         linked_list<int> empty_copy(list);
 
-        CHECK(empty_copy.get_size() == 0);
+        CHECK(empty_copy.size() == 0);
     }
 
     SECTION("intializer list"){
         int arr[] = {1,2,3,4,5};
         linked_list<int> list(arr, 5);
 
-        REQUIRE(list.get_size()==5);
+        REQUIRE(list.size()==5);
 
         CHECK(operator==(list, {1,2,3,4,5}));
     }
@@ -113,8 +113,8 @@ TEST_CASE("linked_list opertor=", "[linked_list]"){
         list.prepend(3.14);
         list.insert_at(3, 0.69);
 
-        REQUIRE(list_copy.get_size() == 3);
-        REQUIRE(list.get_size() == 5);
+        REQUIRE(list_copy.size() == 3);
+        REQUIRE(list.size() == 5);
 
         float* arr_copy = to_array(list_copy);
         float* arr_copied_from = to_array(list);
@@ -130,7 +130,7 @@ TEST_CASE("linked_list opertor=", "[linked_list]"){
     SECTION("self-assignment"){
         list = list;
 
-        REQUIRE(list.get_size() == 3);        
+        REQUIRE(list.size() == 3);        
 
         float* arr_self = to_array(list);
 
@@ -189,8 +189,8 @@ TEST_CASE("linked_list concat operators", "[linked_list]"){
             linked_list<int> list_concat1 = empty + list1;
             linked_list<int> list_concat2 = list1 + empty;
 
-            REQUIRE(list_concat1.get_size() == list1.get_size());
-            REQUIRE(list_concat2.get_size() == list1.get_size());
+            REQUIRE(list_concat1.size() == list1.size());
+            REQUIRE(list_concat2.size() == list1.size());
  
             int* arr_1 = to_array(list_concat1);
             int* arr_2 = to_array(list_concat2);
@@ -205,7 +205,7 @@ TEST_CASE("linked_list concat operators", "[linked_list]"){
         }
         linked_list<int> list_concat = list1 + list2;
 
-        REQUIRE(list_concat.get_size() == list1.get_size() + list2.get_size());
+        REQUIRE(list_concat.size() == list1.size() + list2.size());
 
         int* arr_concat = to_array(list_concat);
 
@@ -221,7 +221,7 @@ TEST_CASE("linked_list concat operators", "[linked_list]"){
         linked_list<int> list3(arr3, 3);
         linked_list<int> list_concat = list1 + list2 + list3;
 
-        REQUIRE(list_concat.get_size() == list1.get_size() + list2.get_size() + list3.get_size());
+        REQUIRE(list_concat.size() == list1.size() + list2.size() + list3.size());
 
         int* arr_concat = to_array(list_concat);
 
@@ -230,10 +230,10 @@ TEST_CASE("linked_list concat operators", "[linked_list]"){
     }
 
     SECTION("operator+="){
-        size_t old_size = list1.get_size();
+        size_t old_size = list1.size();
         list1 += list2;
 
-        REQUIRE(list1.get_size() == old_size + list2.get_size());
+        REQUIRE(list1.size() == old_size + list2.size());
 
         int* arr_concat = to_array(list1);
 
@@ -242,13 +242,13 @@ TEST_CASE("linked_list concat operators", "[linked_list]"){
     }
 }
 
-TEST_CASE("linked_list get/get_sublist/insert_at exceptions", "[linked_list]"){
+TEST_CASE("linked_list at/get_sublist/insert_at exceptions", "[linked_list]"){
     int arr[] = {1,2,3};
     linked_list<int> list(arr, 3);
 
-    SECTION("get out_of_range"){
-        CHECK_THROWS(list.get(3));
-        CHECK_THROWS(list.get(-1));
+    SECTION("at out_of_range"){
+        CHECK_THROWS(list.at(3));
+        CHECK_THROWS(list.at(-1));
     }
 
     SECTION("insert_at out_of_range"){
@@ -257,12 +257,12 @@ TEST_CASE("linked_list get/get_sublist/insert_at exceptions", "[linked_list]"){
         CHECK_NOTHROW(list.insert_at(3, 3));
     }
 
-    SECTION("get_sub_list"){
-        CHECK_THROWS(list.get_sub_list(3, 0));
-        CHECK_THROWS(list.get_sub_list(-1, 0));
-        CHECK_THROWS(list.get_sub_list(0, 4));
-        CHECK_THROWS(list.get_sub_list(0, -1));
-        CHECK_NOTHROW(list.get_sub_list(0, 3));
+    SECTION("get_sublist"){
+        CHECK_THROWS(list.get_sublist(3, 0));
+        CHECK_THROWS(list.get_sublist(-1, 0));
+        CHECK_THROWS(list.get_sublist(0, 4));
+        CHECK_THROWS(list.get_sublist(0, -1));
+        CHECK_NOTHROW(list.get_sublist(0, 3));
     }
 }
 
@@ -275,19 +275,19 @@ TEST_CASE("linked_list adding an element", "[linked_list]"){
         SECTION("to empty"){
             linked_list<int> empty;
             empty.append(0);
-            CHECK(empty.get(0) == 0);
-            CHECK(empty.get_first() == 0);
-            CHECK(empty.get_last() == 0);
+            CHECK(empty.at(0) == 0);
+            CHECK(empty.first() == 0);
+            CHECK(empty.last() == 0);
         }
         SECTION("to existing"){
             list.append(4);
             int expect_arr[] = {1,2,3,4};
             int* app_arr = to_array(list);
 
-            REQUIRE(list.get_size() == 4);
+            REQUIRE(list.size() == 4);
 
-            CHECK(list.get_first() == 1);
-            CHECK(list.get_last() == 4);
+            CHECK(list.first() == 1);
+            CHECK(list.last() == 4);
             CHECK(std::equal(expect_arr, expect_arr + 4, app_arr));
             delete[] app_arr;
         }
@@ -298,20 +298,20 @@ TEST_CASE("linked_list adding an element", "[linked_list]"){
             linked_list<int> empty;
             empty.prepend(0);
             
-            CHECK(empty.get(0) == 0);
-            CHECK(empty.get_first() == 0);
-            CHECK(empty.get_last() == 0);
+            CHECK(empty.at(0) == 0);
+            CHECK(empty.first() == 0);
+            CHECK(empty.last() == 0);
         }
         SECTION("to existing"){
             list.prepend(0);
             int expect_arr[] = {0,1,2,3};
             int* app_arr = to_array(list);
 
-            REQUIRE(list.get_size() == 4);
+            REQUIRE(list.size() == 4);
 
             CHECK(std::equal(expect_arr, expect_arr + 4, app_arr));
-            CHECK(list.get_first() == 0);
-            CHECK(list.get_last() == 3);
+            CHECK(list.first() == 0);
+            CHECK(list.last() == 3);
             delete[] app_arr;
         }
     }
@@ -321,56 +321,89 @@ TEST_CASE("linked_list adding an element", "[linked_list]"){
             linked_list<int> empty;
             empty.insert_at(0, 0);
 
-            CHECK(empty.get(0) == 0);
-            CHECK(empty.get_first() == 0);
-            CHECK(empty.get_last() == 0);
+            CHECK(empty.at(0) == 0);
+            CHECK(empty.first() == 0);
+            CHECK(empty.last() == 0);
         }
         SECTION("to existing"){
             list.insert_at(2, 23);
             int expect_arr[] = {1,2,23, 3};
             int* app_arr = to_array(list);
 
-            REQUIRE(list.get_size() == 4);
+            REQUIRE(list.size() == 4);
 
             CHECK(std::equal(expect_arr, expect_arr + 4, app_arr));
-            CHECK(list.get_first() == 1);
-            CHECK(list.get_last() == 3);
+            CHECK(list.first() == 1);
+            CHECK(list.last() == 3);
             delete[] app_arr;
         }
     }
 }
 
-TEST_CASE("linked_list get_sub_list", "[linked_list]"){
+TEST_CASE("linked_list accessing and element", "[linked_list]"){
+    linked_list<int> list({1,2,3,4});
+    const linked_list<int>& cref = list;
+    
+    SECTION("first"){
+        list.first() = 5;
+        CHECK(list.first() == 5);
+        CHECK(cref.first() == 5);
+        CHECK(operator==(list, {5,2,3,4}));
+    }
+    SECTION("last"){
+        list.last() = 5;
+        CHECK(list.last() == 5);
+        CHECK(cref.last() == 5);
+        CHECK(operator==(list, {1,2,3,5}));
+    }
+    SECTION("at"){
+        list.at(2) = 5;
+        CHECK(list.at(2) == 5);
+        CHECK(cref.at(2) == 5);
+        CHECK(operator==(list, {1,2,5,4}));
+    }
+}
+
+TEST_CASE("linked_list get_sublist", "[linked_list]"){
     int arr[] = {1,2,3,4,5,6,7};
     linked_list<int> list(arr, 7);
 
     SECTION("middle sublist"){
-        linked_list<int> sub = list.get_sub_list(2, 5);
+        linked_list<int> sub = list.get_sublist(2, 5);
 
         CHECK(operator==(sub, {3,4,5}));
     }
     SECTION("start sublist"){
-        linked_list<int> sub = list.get_sub_list(0, 4);
+        linked_list<int> sub = list.get_sublist(0, 4);
 
         CHECK(operator==(sub, {1,2,3,4}));
     }
     SECTION("end sublist"){
-        linked_list<int> sub = list.get_sub_list(4, 7);
+        linked_list<int> sub = list.get_sublist(4, 7);
 
         CHECK(operator==(sub, {5,6,7}));
     }
     SECTION("full sublist"){
-        linked_list<int> sub = list.get_sub_list(0, 7);
+        linked_list<int> sub = list.get_sublist(0, 7);
 
         CHECK(operator==(sub, {1,2,3,4,5,6,7}));
     }
     SECTION("empty sublist"){
-        linked_list<int> sub1 = list.get_sub_list(4, 4);
-        linked_list<int> sub2 = list.get_sub_list(7, 7);
-        linked_list<int> sub3 = list.get_sub_list(0, 0);
+        linked_list<int> sub1 = list.get_sublist(4, 4);
+        linked_list<int> sub2 = list.get_sublist(7, 7);
+        linked_list<int> sub3 = list.get_sublist(0, 0);
 
         CHECK(operator==(sub1, {}));
         CHECK(operator==(sub2, {}));
         CHECK(operator==(sub3, {}));
     }
+}
+
+TEST_CASE("linked_list clear", "[linked_list]"){
+    linked_list<int> list = {1,2,3,4};
+    list.clear();
+
+    CHECK(list.size() == 0);
+    CHECK_THROWS(list.first());
+    CHECK_THROWS(list.last());
 }
