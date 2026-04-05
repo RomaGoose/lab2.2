@@ -19,15 +19,17 @@ class dynamic_array {
         dynamic_array(size_t size_);
         dynamic_array(T* items_ptr, size_t size_);
         dynamic_array(const dynamic_array<T>& other);
+        dynamic_array(dynamic_array<T>&& other);
         dynamic_array(std::initializer_list<T> init_list);
 
         ~dynamic_array();
 
         dynamic_array<T>& operator=(const dynamic_array<T>& other);
-        const T& operator[](size_t index) const;
-        T& operator[](size_t index);
+        dynamic_array<T>& operator=(dynamic_array<T>&& other);
+        const T& operator[](size_t index) const noexcept;
+        T& operator[](size_t index) noexcept;
 
-        size_t size() const;
+        size_t size() const noexcept;
 
         const T& at(size_t index) const;
         T& at(size_t index);
@@ -57,8 +59,12 @@ dynamic_array<T>::dynamic_array(T* items_, size_t size) : items(new T[size]), si
 }
 
 template <class T>
-dynamic_array<T>::dynamic_array(const dynamic_array<T>& other) : items(new T[other.size_]), size_(other.size_) {
-    std::copy(other.items, other.items + size_, items);
+dynamic_array<T>::dynamic_array(const dynamic_array<T>& other) : items(nullptr), size_() {
+    *this = other;
+}
+template <class T>
+dynamic_array<T>::dynamic_array(dynamic_array<T>&& other) : items(nullptr), size_() {
+    *this = other;
 }
 template <class T>
 dynamic_array<T>::dynamic_array(std::initializer_list<T> init_list) : items(new T[init_list.size()]), size_(init_list.size()){
@@ -85,17 +91,31 @@ dynamic_array<T>& dynamic_array<T>::operator=(const dynamic_array<T>& other){
     return *this;
 }
 
+template <class T>
+dynamic_array<T>& dynamic_array<T>::operator=(dynamic_array<T>&& other){
+    if (this == &other) 
+        return *this;
+    
+    delete[] items;
+    items = other.items;
+    size_ = other.size_;
+
+    other.items = nullptr;
+    other.size_ = 0;
+    return *this;
+}
+
 template<class T>
-const T& dynamic_array<T>::operator[](size_t index) const {
+const T& dynamic_array<T>::operator[](size_t index) const noexcept{
     return items[index];
 }
 template<class T>
-T& dynamic_array<T>::operator[](size_t index) {
+T& dynamic_array<T>::operator[](size_t index) noexcept{
     return items[index];
 }
 
 template <class T>
-size_t dynamic_array<T>::size() const{
+size_t dynamic_array<T>::size() const noexcept{
     return size_;    
 }
 

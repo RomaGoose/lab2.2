@@ -10,11 +10,9 @@
 template<class T>
 class linked_list{
     public:
-    
         template<bool is_const>
         class base_iterator;
         struct sentinel {};
-        struct node;
 
         using iterator = base_iterator<false>;
         using const_iterator = base_iterator<true>;
@@ -38,7 +36,7 @@ class linked_list{
         T& first();
         T& last();
         T& at(size_t index);
-        size_t size() const;
+        size_t size() const noexcept;
 
         iterator begin();
 
@@ -54,11 +52,13 @@ class linked_list{
         void prepend(U&& item);
         template<class U> 
         void insert_at(size_t index, U&& item);
-        void clear();
+        void clear() noexcept;
 
         linked_list<T> get_sublist(size_t start_index, size_t end_index) const;
     
     private:
+        struct node;
+
         std::shared_ptr<node> head;
         std::weak_ptr<node> tail;
         size_t size_;
@@ -161,14 +161,14 @@ void linked_list<T>::insert_at(size_t index, U&& item){
     ++size_;
 };
 template<class T> 
-void linked_list<T>::clear(){
+void linked_list<T>::clear() noexcept{
     head.reset();
     tail.reset();
     size_ = 0;
 }
 
 template<class T> 
-size_t linked_list<T>::size() const {
+size_t linked_list<T>::size() const noexcept{
     return size_;
 };
 template<class T>

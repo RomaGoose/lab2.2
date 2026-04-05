@@ -73,7 +73,6 @@ TEST_CASE("dyn_arr operator=", "[dyn_arr]"){
     dynamic_array<float> darr(arr, 3);
         
     SECTION("copy assignment"){
-
         SECTION("same sizes"){
             dynamic_array<float> darr_copy = {1,2,3};
             darr_copy = darr;
@@ -101,13 +100,44 @@ TEST_CASE("dyn_arr operator=", "[dyn_arr]"){
             CHECK(std::equal(std::begin(new_arr), std::end(new_arr), std::begin(darr)));
         }
     }
+    SECTION("move assignment"){
+        SECTION("same sizes"){
+            dynamic_array<float> darr_copy = {1,2,3};
+            darr_copy = std::move(darr);
+    
+            REQUIRE(darr_copy.size() == 3);
+            REQUIRE(darr.size() == 0);
+    
+            CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(darr_copy)));
+            CHECK_THROWS_AS(darr.at(0), std::out_of_range);
+        }
+        SECTION("different sizes"){
+            dynamic_array<float> darr_copy;
+            darr_copy = std::move(darr);
+    
+            REQUIRE(darr_copy.size() == 3);
+            REQUIRE(darr.size() == 0);
+    
+            CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(darr_copy)));
+            CHECK_THROWS_AS(darr.at(0), std::out_of_range);
+        }
+    }
 
     SECTION("self-assignment"){
-        darr = darr;
-
-        REQUIRE(darr.size() == 3);        
-
-        CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(darr)));
+        SECTION("copy"){
+            darr = darr;
+    
+            REQUIRE(darr.size() == 3);        
+    
+            CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(darr)));
+        }
+        SECTION("move"){
+            darr = std::move(darr);
+    
+            REQUIRE(darr.size() == 3);        
+    
+            CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(darr)));
+        }
     }
 }
 
