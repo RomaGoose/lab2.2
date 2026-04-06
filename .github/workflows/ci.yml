@@ -1,0 +1,23 @@
+name: сборка -> тестирование
+
+on: [push]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: установка инструментов сборки
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake
+        
+      - name: конфигурация cmake
+        run: cmake -S . -B build
+      
+      - name: сборка
+        run: cmake --build build
+
+      - name: тестирование
+        run: ./build/tests
