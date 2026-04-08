@@ -68,23 +68,23 @@ class linked_list{
 };
 
 template<class T> 
-typename linked_list<T>::iterator linked_list<T>::begin() {
+linked_list<T>::iterator linked_list<T>::begin() {
     return iterator(head);
 };
 template<class T> 
-typename linked_list<T>::const_iterator linked_list<T>::begin() const {
+linked_list<T>::const_iterator linked_list<T>::begin() const {
     return const_iterator(head);
 };
 template<class T> 
-typename linked_list<T>::sentinel linked_list<T>::end() const {
+linked_list<T>::sentinel linked_list<T>::end() const {
     return {};
 };
 template<class T> 
-typename linked_list<T>::const_iterator linked_list<T>::cbegin() const{
+linked_list<T>::const_iterator linked_list<T>::cbegin() const{
     return const_iterator(head);
 };
 template<class T> 
-typename linked_list<T>::sentinel linked_list<T>::cend() const {
+linked_list<T>::sentinel linked_list<T>::cend() const {
     return {};
 };
 
@@ -147,8 +147,8 @@ template<class T>
 template<class U> 
 void linked_list<T>::insert_at(size_t index, U&& item){
     if(index > size_) throw std::out_of_range("index out of range");
-    if(index == 0) { prepend(item); return; }
-    if(index == size_) { append(item); return; }
+    if(index == 0) { prepend(std::forward<U>(item)); return; }
+    if(index == size_) { append(std::forward<U>(item)); return; }
 
     auto new_node = std::make_shared<node>(std::forward<U>(item));
     auto behind = get_node(index - 1);
@@ -299,7 +299,7 @@ class linked_list<T>::base_iterator{
         ref operator*(){
             return ptr.lock()->value;
         }
-        friend bool operator!=(const base_iterator<is_const>& it, sentinel){
+        friend bool operator!=(const base_iterator<is_const>& it, sentinel s){
             return it.ptr.lock() != nullptr;
         };
 };

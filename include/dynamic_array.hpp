@@ -19,13 +19,13 @@ class dynamic_array {
         dynamic_array(size_t size_);
         dynamic_array(T* items_ptr, size_t size_);
         dynamic_array(const dynamic_array<T>& other);
-        dynamic_array(dynamic_array<T>&& other);
+        dynamic_array(dynamic_array<T>&& other) noexcept;
         dynamic_array(std::initializer_list<T> init_list);
 
         ~dynamic_array();
 
         dynamic_array<T>& operator=(const dynamic_array<T>& other);
-        dynamic_array<T>& operator=(dynamic_array<T>&& other);
+        dynamic_array<T>& operator=(dynamic_array<T>&& other) noexcept;
         const T& operator[](size_t index) const noexcept;
         T& operator[](size_t index) noexcept;
 
@@ -63,7 +63,7 @@ dynamic_array<T>::dynamic_array(const dynamic_array<T>& other) : items(nullptr),
     *this = other;
 }
 template <class T>
-dynamic_array<T>::dynamic_array(dynamic_array<T>&& other) : items(nullptr), size_() {
+dynamic_array<T>::dynamic_array(dynamic_array<T>&& other) noexcept : items(nullptr), size_() {
     *this = other;
 }
 template <class T>
@@ -92,7 +92,7 @@ dynamic_array<T>& dynamic_array<T>::operator=(const dynamic_array<T>& other){
 }
 
 template <class T>
-dynamic_array<T>& dynamic_array<T>::operator=(dynamic_array<T>&& other){
+dynamic_array<T>& dynamic_array<T>::operator=(dynamic_array<T>&& other) noexcept {
     if (this == &other) 
         return *this;
     
@@ -174,22 +174,22 @@ struct dynamic_array<T>::sentinel{
 };
 
 template<class T>
-typename dynamic_array<T>::iterator dynamic_array<T>::begin() {
+dynamic_array<T>::iterator dynamic_array<T>::begin() {
     return iterator(items);
 }
 template<class T>
-typename dynamic_array<T>::const_iterator dynamic_array<T>::begin() const{
+dynamic_array<T>::const_iterator dynamic_array<T>::begin() const{
     return iterator(items);
 }
 template<class T>
-typename dynamic_array<T>::sentinel dynamic_array<T>::end() const{
+dynamic_array<T>::sentinel dynamic_array<T>::end() const{
     return sentinel(items + size_);
 }
 template<class T>
-typename dynamic_array<T>::const_iterator dynamic_array<T>::cbegin() const{
+dynamic_array<T>::const_iterator dynamic_array<T>::cbegin() const{
     return iterator(items);
 }
 template<class T>
-typename dynamic_array<T>::sentinel dynamic_array<T>::cend() const{
+dynamic_array<T>::sentinel dynamic_array<T>::cend() const{
     return sentinel(items + size_);
 }
