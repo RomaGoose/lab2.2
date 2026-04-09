@@ -1,15 +1,17 @@
+#pragma once
+
 #include <cstddef>
 #include <algorithm>
 #include <initializer_list>
 #include <iterator>
 #include <stdexcept>
+#include <utility>
 
 template <class T>
 class dynamic_array {
     public:
         template<bool is_const>
         class base_iterator;
-        struct sentinel;
 
         using iterator = base_iterator<false>;
         using const_iterator = base_iterator<true>;
@@ -35,11 +37,12 @@ class dynamic_array {
         T& at(size_t index);
 
         iterator begin();
+        iterator end();
 
         const_iterator begin() const;
-        sentinel end() const;
+        const_iterator end() const;
         const_iterator cbegin() const;
-        sentinel cend() const;
+        const_iterator cend() const;
         
         void resize(size_t new_size);
     private:
@@ -64,7 +67,7 @@ dynamic_array<T>::dynamic_array(const dynamic_array<T>& other) : items(nullptr),
 }
 template <class T>
 dynamic_array<T>::dynamic_array(dynamic_array<T>&& other) noexcept : items(nullptr), size_() {
-    *this = other;
+    *this = std::move(other);
 }
 template <class T>
 dynamic_array<T>::dynamic_array(std::initializer_list<T> init_list) : items(new T[init_list.size()]), size_(init_list.size()){
@@ -137,7 +140,7 @@ void dynamic_array<T>::resize(size_t new_size){
     if(new_size == size_) return;
 
     auto new_items = new T[new_size];
-    std::copy(items, items + std::min({size_, new_size}), new_items);
+    std::move(items, items + std::min({size_, new_size}), new_items);
 
     delete[] items;
     items = new_items;
@@ -151,26 +154,50 @@ class dynamic_array<T>::base_iterator{
     private: 
         T* ptr;
     public:
-        using ref = std::conditional_t<is_const, const T&, T&>;
-    
+        using reference = std::conditional_t<is_const, const T&, T&>;
+        using difference_type = ptrdiff_t;
+        using value_type = T;
+        using iterator_category = std::random_access_iterator_tag;
+
         base_iterator(T* ptr_) : ptr(ptr_) {};
 
         base_iterator& operator++(){
             ++ptr;
             return *this;
-        };
-        ref operator*(){
+        }
+        base_iterator& operator--(){
+            --ptr;
+            return *this;
+        }
+        reference operator*() const {
             return *ptr;
         }
-        friend bool operator!=(const base_iterator<is_const>& it, const sentinel& s){
-            return it.ptr != s.ptr;
+        base_iterator& operator+=(difference_type n) {
+            ptr += n;
+            return *this;
         };
-};
-template<class T>
-struct dynamic_array<T>::sentinel{
-    T* ptr;
+        base_iterator operator+(difference_type n) const { 
+            auto tmp = *this; 
+            tmp += n; 
+            return tmp; 
+        }
+        base_iterator& operator-=(difference_type n) {
+            ptr -= n;
+            return *this;
+        }
+        base_iterator operator-(difference_type n) const { 
+            auto tmp = *this; 
+            tmp -= n; 
+            return tmp; 
+        }
+        difference_type operator-(const iterator& other) const {
+            return ptr - other.ptr;
+        }
+        reference operator[](difference_type n) const { 
+            return *(*this + n); 
+        }
 
-    sentinel(T* ptr_) : ptr(ptr_) {}; 
+        auto operator<=>(const base_iterator<is_const>& other) const = default;
 };
 
 template<class T>
@@ -178,18 +205,22 @@ dynamic_array<T>::iterator dynamic_array<T>::begin() {
     return iterator(items);
 }
 template<class T>
-dynamic_array<T>::const_iterator dynamic_array<T>::begin() const{
-    return iterator(items);
+dynamic_array<T>::iterator dynamic_array<T>::end() {
+    return iterator(items + size_);
 }
 template<class T>
-dynamic_array<T>::sentinel dynamic_array<T>::end() const{
-    return sentinel(items + size_);
+dynamic_array<T>::const_iterator dynamic_array<T>::begin() const{
+    return const_iterator(items);
+}
+template<class T>
+dynamic_array<T>::const_iterator dynamic_array<T>::end() const{
+    return const_iterator(items + size_);
 }
 template<class T>
 dynamic_array<T>::const_iterator dynamic_array<T>::cbegin() const{
-    return iterator(items);
+    return const_iterator(items);
 }
 template<class T>
-dynamic_array<T>::sentinel dynamic_array<T>::cend() const{
-    return sentinel(items + size_);
+dynamic_array<T>::const_iterator dynamic_array<T>::cend() const{
+    return const_iterator(items + size_);
 }

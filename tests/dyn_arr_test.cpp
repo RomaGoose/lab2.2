@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <catch2/catch_test_macros.hpp>
 #include <cstddef>
+#include <initializer_list>
 #include <iterator>
 #include <stdexcept>
 
@@ -57,6 +58,15 @@ TEST_CASE("dyn_arr constructors", "[dyn_arr]"){
 
         CHECK(std::equal(std::begin(arr), std::end(arr), std::begin(arr_copy)));
         CHECK(std::equal(std::begin(new_arr), std::end(new_arr), std::begin(arr_copied_from)));
+    }
+
+    SECTION("move constructor"){
+        dynamic_array<std::string> darr = {"123", "asdad", "r123r1"};
+        auto old = {"123", "asdad", "r123r1"};
+        auto darr_move(std::move(darr));
+
+        CHECK(darr.size() == 0);
+        CHECK(std::equal(std::begin(old), std::end(old), std::begin(darr_move)));
     }
 
     SECTION("initializer list"){
