@@ -1,3 +1,5 @@
+#pragma once
+
 #include <cstddef>
 #include <cstdlib>
 #include <initializer_list>
@@ -288,7 +290,10 @@ class linked_list<T>::base_iterator{
     private: 
         std::weak_ptr<node> ptr;
     public:
-        using ref = std::conditional_t<is_const, const T&, T&>;
+        using reference = std::conditional_t<is_const, const T&, T&>;
+        using difference_type = ptrdiff_t;
+        using value_type = T;
+        using iterator_category = std::forward_iterator_tag;
     
         base_iterator(std::shared_ptr<node> ptr_) : ptr(ptr_) {};
 
@@ -296,10 +301,13 @@ class linked_list<T>::base_iterator{
             ptr = ptr.lock()->next;
             return *this;
         };
-        ref operator*(){
+        reference operator*() const {
             return ptr.lock()->value;
         }
         friend bool operator!=(const base_iterator<is_const>& it, sentinel s){
             return it.ptr.lock() != nullptr;
-        };
+        }
+        bool operator==(const base_iterator<is_const>& other){
+            return ptr.lock() != other.ptr.lock(); 
+        }
 };

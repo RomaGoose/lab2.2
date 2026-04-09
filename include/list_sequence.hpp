@@ -1,6 +1,9 @@
+#pragma once
+
 #include "linked_list.hpp"
 #include <cstddef>
 #include <initializer_list>
+#include <iterator>
 #include <utility>
 
 template<typename  T>
@@ -15,6 +18,8 @@ class list_sequence {
 
         using iterator = base_iterator<false>;
         using const_iterator = base_iterator<true>;
+
+        using value_type = T;
         
 
         list_sequence(std::initializer_list<T> items = {}) : items_(items) {};
@@ -28,7 +33,7 @@ class list_sequence {
             }
             return *it;
         }
-        
+
         T& operator[](size_t index) {
             auto it = items_.begin();
             for(size_t i = 0; i < index; ++i){
@@ -65,30 +70,19 @@ class list_sequence {
             return items_.size();
         }
 
-        list_sequence<T>& append(const T& item) {
-            items_.append(item);
+        template<class U>
+        list_sequence<T>& append(U&& item) {
+            items_.append(std::forward<U>(item));
             return *this;
         }
-        
-        list_sequence<T>& prepend(const T& item) {
-            items_.prepend(item);
+        template<class U>
+        list_sequence<T>& prepend(U&& item) {
+            items_.prepend(std::forward<U>(item));
             return *this;
         }
-        
-        list_sequence<T>& insert_at(size_t index, const T& item) {
-            items_.insert_at(index, item);
-            return *this;
-        }
-        list_sequence<T>& append(T&& item) {
-            items_.append(std::forward<T>(item));
-            return *this;
-        }
-        list_sequence<T>& prepend(T&& item) {
-            items_.prepend(std::forward<T>(item));
-            return *this;
-        }
-        list_sequence<T>& insert_at(size_t index, T&& item) {
-            items_.insert_at(index, std::forward<T>(item));
+        template<class U>
+        list_sequence<T>& insert_at(size_t index, U&& item) {
+            items_.insert_at(index, std::forward<U>(item));
             return *this;
         }
 
@@ -99,7 +93,7 @@ class list_sequence {
             return iterator(items_.begin());
         }
         const_iterator begin() const {
-            return const_iterator(items_.begin());
+            return const_iterator(items_.cbegin());
         }
         sentinel end() const {
             return sentinel();
@@ -110,6 +104,8 @@ class list_sequence {
         sentinel cend() const {
             return sentinel();
         }
+
+        list_sequence<T> get_subsequence(size_t i, size_t i2) const { return *this;};
 };
 
 
@@ -128,18 +124,30 @@ class list_sequence<T>::base_iterator{
     private: 
         linked_list<T>::template base_iterator<is_const> it_inner;
     public:
-        using ref = std::conditional_t<is_const, const T&, T&>;
+        using reference = std::conditional_t<is_const, const T&, T&>;
+        using difference_type = ptrdiff_t;
+        using value_type = T;
+        using iterator_category = std::forward_iterator_tag;
 
         base_iterator(auto it) : it_inner(it) {};
+        base_iterator() : it_inner() {};
 
         base_iterator& operator++(){
             ++it_inner;
             return *this;
         };
-        ref operator*(){
+        base_iterator operator++(int){
+            auto tmp = *this;
+            ++(*this);
+            return tmp;
+        };
+        reference operator*() const {
             return *it_inner;
         }
         friend bool operator!=(const base_iterator<is_const>& it, sentinel s){
             return it.it_inner != s.sen_inner;
-        };
+        }
+        friend bool operator==(const base_iterator<is_const>& it1, const base_iterator<is_const>& it2){
+            return it1.it_inner == it2.it_inner;
+        }
 };
