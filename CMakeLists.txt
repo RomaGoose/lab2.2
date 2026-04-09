@@ -24,6 +24,7 @@ FetchContent_MakeAvailable(Catch2)
 add_executable(tests
     tests/dyn_arr_test.cpp
     tests/linked_list_test.cpp
+    tests/sequence_test.cpp
 )
 
 target_include_directories(tests PRIVATE

@@ -1,10 +1,6 @@
-#include <cstddef>
-#include <cstdlib>
-#include <initializer_list>
+#pragma once
+
 #include <memory>
-#include <stdexcept>
-#include <type_traits>
-#include <utility>
 
 
 template<class T>
@@ -67,24 +63,53 @@ class linked_list{
         std::shared_ptr<node> get_node(size_t index) const;
 };
 
+template<class T>
+template<bool is_const>
+class linked_list<T>::base_iterator{
+    private: 
+        std::weak_ptr<node> ptr;
+    public:
+        using reference = std::conditional_t<is_const, const T&, T&>;
+        using difference_type = ptrdiff_t;
+        using value_type = T;
+        using iterator_category = std::forward_iterator_tag;
+    
+        base_iterator(std::shared_ptr<node> ptr_) : ptr(ptr_) {};
+
+        base_iterator& operator++(){
+            ptr = ptr.lock()->next;
+            return *this;
+        };
+        reference operator*() const {
+            return ptr.lock()->value;
+        }
+        friend bool operator!=(const base_iterator<is_const>& it, sentinel s){
+            return it.ptr.lock() != nullptr;
+        }
+        bool operator==(const base_iterator<is_const>& other){
+            return ptr.lock() != other.ptr.lock(); 
+        }
+};
+
+
 template<class T> 
-typename linked_list<T>::iterator linked_list<T>::begin() {
+linked_list<T>::iterator linked_list<T>::begin() {
     return iterator(head);
 };
 template<class T> 
-typename linked_list<T>::const_iterator linked_list<T>::begin() const {
+linked_list<T>::const_iterator linked_list<T>::begin() const {
     return const_iterator(head);
 };
 template<class T> 
-typename linked_list<T>::sentinel linked_list<T>::end() const {
+linked_list<T>::sentinel linked_list<T>::end() const {
     return {};
 };
 template<class T> 
-typename linked_list<T>::const_iterator linked_list<T>::cbegin() const{
+linked_list<T>::const_iterator linked_list<T>::cbegin() const{
     return const_iterator(head);
 };
 template<class T> 
-typename linked_list<T>::sentinel linked_list<T>::cend() const {
+linked_list<T>::sentinel linked_list<T>::cend() const {
     return {};
 };
 
@@ -147,8 +172,8 @@ template<class T>
 template<class U> 
 void linked_list<T>::insert_at(size_t index, U&& item){
     if(index > size_) throw std::out_of_range("index out of range");
-    if(index == 0) { prepend(item); return; }
-    if(index == size_) { append(item); return; }
+    if(index == 0) { prepend(std::forward<U>(item)); return; }
+    if(index == size_) { append(std::forward<U>(item)); return; }
 
     auto new_node = std::make_shared<node>(std::forward<U>(item));
     auto behind = get_node(index - 1);
@@ -230,8 +255,7 @@ std::shared_ptr<typename linked_list<T>::node> linked_list<T>::get_node(size_t i
 };
 template<class T>
 linked_list<T> linked_list<T>::get_sublist(size_t start_index, size_t end_index) const {
-    if(start_index > size_ || 
-       end_index   > size_ || 
+    if(end_index > size_ || 
        start_index > end_index) 
         throw std::out_of_range("index out of range");
 
@@ -279,27 +303,4 @@ struct linked_list<T>::node{
         template<class U>
         requires std::is_convertible_v<U, T>
         node(U&& val) : value(std::forward<U>(val)) {};
-};
-
-
-template<class T>
-template<bool is_const>
-class linked_list<T>::base_iterator{
-    private: 
-        std::weak_ptr<node> ptr;
-    public:
-        using ref = std::conditional_t<is_const, const T&, T&>;
-    
-        base_iterator(std::shared_ptr<node> ptr_) : ptr(ptr_) {};
-
-        base_iterator& operator++(){
-            ptr = ptr.lock()->next;
-            return *this;
-        };
-        ref operator*(){
-            return ptr.lock()->value;
-        }
-        friend bool operator!=(const base_iterator<is_const>& it, sentinel){
-            return it.ptr.lock() != nullptr;
-        };
 };

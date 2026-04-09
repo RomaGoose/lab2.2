@@ -1,13 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
 #include "linked_list.hpp"
-#include <algorithm>
-#include <array>
-#include <cstddef>
-#include <initializer_list>
-#include <iostream>
-#include <iterator>
-#include <vector>
-
 
 template<class T>
 static T* to_array(const linked_list<T>& list){
@@ -143,7 +135,7 @@ TEST_CASE("linked_list isnert", "[linked_list]"){
     int arr[] = {1,2,3,4};
     linked_list<int> list(arr, 4);
 
-    SECTION("first (prepend)"){
+    SECTION("first"){
         list.insert_at(0, 0);
 
         int new_arr[] = {0,1,2,3,4};
@@ -153,7 +145,7 @@ TEST_CASE("linked_list isnert", "[linked_list]"){
 
         delete[] list_arr;
     }
-    SECTION("last (append)"){
+    SECTION("last"){
         list.insert_at(4, 5);
 
         int new_arr[] = {1,2,3,4,5};
@@ -291,6 +283,14 @@ TEST_CASE("linked_list adding an element", "[linked_list]"){
             CHECK(std::equal(expect_arr, expect_arr + 4, app_arr));
             delete[] app_arr;
         }
+        SECTION("append with move") {
+            linked_list<std::string> seq;
+            std::string s = "hello";
+            seq.append(std::move(s));
+            CHECK(seq.size() == 1);
+            CHECK(seq.first() == "hello");
+            CHECK(s.empty());  
+        }
     }
 
     SECTION("prepend"){
@@ -314,6 +314,14 @@ TEST_CASE("linked_list adding an element", "[linked_list]"){
             CHECK(list.last() == 3);
             delete[] app_arr;
         }
+        SECTION("prepend with move") {
+            linked_list<std::string> seq;
+            std::string s = "hello";
+            seq.append(std::move(s));
+            CHECK(seq.size() == 1);
+            CHECK(seq.first() == "hello");
+            CHECK(s.empty());  
+        }
     }
 
     SECTION("insert_at"){
@@ -336,6 +344,14 @@ TEST_CASE("linked_list adding an element", "[linked_list]"){
             CHECK(list.first() == 1);
             CHECK(list.last() == 3);
             delete[] app_arr;
+        }
+        SECTION("insert with move") {
+            linked_list<std::string> seq;
+            std::string s = "hello";
+            seq.insert_at(0, std::move(s));
+            CHECK(seq.size() == 1);
+            CHECK(seq.first() == "hello");
+            CHECK(s.empty());  
         }
     }
 }
