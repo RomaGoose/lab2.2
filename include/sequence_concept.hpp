@@ -1,9 +1,6 @@
 #pragma once
 
-#include <concepts>
-#include <cstddef>
 #include <iterator>
-#include <utility>
 
 template<class Seq>
 concept sequence = requires (Seq s, const Seq& cs, size_t i, size_t end, size_t start, typename Seq::value_type item) {

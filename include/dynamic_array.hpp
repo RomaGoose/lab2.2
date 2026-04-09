@@ -1,11 +1,7 @@
 #pragma once
 
-#include <cstddef>
 #include <algorithm>
-#include <initializer_list>
 #include <iterator>
-#include <stdexcept>
-#include <utility>
 
 template <class T>
 class dynamic_array {
@@ -224,3 +220,4 @@ template<class T>
 dynamic_array<T>::const_iterator dynamic_array<T>::cend() const{
     return const_iterator(items + size_);
 }
+

@@ -1,10 +1,6 @@
-#include "dynamic_array.hpp"
-#include <algorithm>
 #include <catch2/catch_test_macros.hpp>
-#include <cstddef>
-#include <initializer_list>
-#include <iterator>
-#include <stdexcept>
+
+#include "dynamic_array.hpp"
 
 TEST_CASE("dyn_arr constructors", "[dyn_arr]"){
 

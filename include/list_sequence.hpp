@@ -1,10 +1,6 @@
 #pragma once
 
 #include "linked_list.hpp"
-#include <cstddef>
-#include <initializer_list>
-#include <iterator>
-#include <utility>
 
 template<typename  T>
 class list_sequence {

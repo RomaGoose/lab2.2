@@ -1,13 +1,6 @@
 #pragma once
 
 #include "dynamic_array.hpp"
-#include <algorithm>
-#include <bit>
-#include <cstddef>
-#include <initializer_list>
-#include <iterator>
-#include <stdexcept>
-#include <utility>
 
 template<class T>
 class array_sequence {
@@ -18,7 +11,6 @@ class array_sequence {
         
         template<bool is_const>
         class base_iterator;
-        struct sentinel;
 
         using iterator = base_iterator<false>;
         using const_iterator = base_iterator<true>;

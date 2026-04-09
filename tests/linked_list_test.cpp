@@ -1,13 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
 #include "linked_list.hpp"
-#include <algorithm>
-#include <array>
-#include <cstddef>
-#include <initializer_list>
-#include <iostream>
-#include <iterator>
-#include <vector>
-
 
 template<class T>
 static T* to_array(const linked_list<T>& list){

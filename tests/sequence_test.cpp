@@ -1,8 +1,5 @@
 #include "catch2/catch_test_macros.hpp"
 #include "catch2/catch_template_test_macros.hpp"
-#include <cstddef>
-#include <initializer_list>
-#include <string>
 
 #include "list_sequence.hpp"
 #include "array_sequence.hpp"

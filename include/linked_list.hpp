@@ -1,12 +1,6 @@
 #pragma once
 
-#include <cstddef>
-#include <cstdlib>
-#include <initializer_list>
 #include <memory>
-#include <stdexcept>
-#include <type_traits>
-#include <utility>
 
 
 template<class T>
@@ -68,6 +62,35 @@ class linked_list{
         std::shared_ptr<node> get_node(size_t index);
         std::shared_ptr<node> get_node(size_t index) const;
 };
+
+template<class T>
+template<bool is_const>
+class linked_list<T>::base_iterator{
+    private: 
+        std::weak_ptr<node> ptr;
+    public:
+        using reference = std::conditional_t<is_const, const T&, T&>;
+        using difference_type = ptrdiff_t;
+        using value_type = T;
+        using iterator_category = std::forward_iterator_tag;
+    
+        base_iterator(std::shared_ptr<node> ptr_) : ptr(ptr_) {};
+
+        base_iterator& operator++(){
+            ptr = ptr.lock()->next;
+            return *this;
+        };
+        reference operator*() const {
+            return ptr.lock()->value;
+        }
+        friend bool operator!=(const base_iterator<is_const>& it, sentinel s){
+            return it.ptr.lock() != nullptr;
+        }
+        bool operator==(const base_iterator<is_const>& other){
+            return ptr.lock() != other.ptr.lock(); 
+        }
+};
+
 
 template<class T> 
 linked_list<T>::iterator linked_list<T>::begin() {
@@ -280,33 +303,4 @@ struct linked_list<T>::node{
         template<class U>
         requires std::is_convertible_v<U, T>
         node(U&& val) : value(std::forward<U>(val)) {};
-};
-
-
-template<class T>
-template<bool is_const>
-class linked_list<T>::base_iterator{
-    private: 
-        std::weak_ptr<node> ptr;
-    public:
-        using reference = std::conditional_t<is_const, const T&, T&>;
-        using difference_type = ptrdiff_t;
-        using value_type = T;
-        using iterator_category = std::forward_iterator_tag;
-    
-        base_iterator(std::shared_ptr<node> ptr_) : ptr(ptr_) {};
-
-        base_iterator& operator++(){
-            ptr = ptr.lock()->next;
-            return *this;
-        };
-        reference operator*() const {
-            return ptr.lock()->value;
-        }
-        friend bool operator!=(const base_iterator<is_const>& it, sentinel s){
-            return it.ptr.lock() != nullptr;
-        }
-        bool operator==(const base_iterator<is_const>& other){
-            return ptr.lock() != other.ptr.lock(); 
-        }
 };
