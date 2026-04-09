@@ -247,6 +247,40 @@ TEMPLATE_TEST_CASE("common sequence behaviour test", "[sequence]",
             CHECK_THROWS(empty.last());
         }
     }
+    SECTION("sequence get_subsequence", "[linked_list]"){
+        TestType seq = {1,2,3,4,5,6,7};
+        TestType sub;
+
+        SECTION("middle sublist"){
+            sub = seq.get_subsequence(2, 5);
+
+            CHECK(sub == std::initializer_list<type>{3,4,5});
+        }
+        SECTION("start sublist"){
+            sub = seq.get_subsequence(0, 4);
+
+            CHECK(sub == std::initializer_list<type>{1,2,3,4});
+        }
+        SECTION("end sublist"){
+            sub = seq.get_subsequence(4, 7);
+
+            CHECK(sub == std::initializer_list<type>{5,6,7});
+        }
+        SECTION("full sublist"){
+            sub = seq.get_subsequence(0, 7);
+
+            CHECK(sub == std::initializer_list<type>{1,2,3,4,5,6,7});
+        }
+        SECTION("empty sublist"){
+            TestType sub1 = seq.get_subsequence(4, 4);
+            TestType sub2 = seq.get_subsequence(7, 7);
+            TestType sub3 = seq.get_subsequence(0, 0);
+
+            CHECK(sub1 == std::initializer_list<type>{});
+            CHECK(sub2 == std::initializer_list<type>{});
+            CHECK(sub3 == std::initializer_list<type>{});
+        }
+    }
 }
 
 TEMPLATE_TEST_CASE("sequence move methods", "[sequence]", 
@@ -286,9 +320,14 @@ TEMPLATE_TEST_CASE("sequence move methods", "[sequence]",
     }
 }
 
-TEST_CASE("array_seq specific", "[arr_seq]"){
+TEMPLATE_TEST_CASE("array_seq specific", "[arr_seq]",
+                    array_sequence<int>,
+                    array_sequence<float>,
+                    array_sequence<short>,
+                    array_sequence<double>,
+                    array_sequence<size_t>){
     SECTION("growth check"){
-        array_sequence<int> seq;
+        TestType seq;
         for(size_t i = 0; i < 10000; ++i){
             seq.append(i);
         }
@@ -296,7 +335,7 @@ TEST_CASE("array_seq specific", "[arr_seq]"){
     }
 
     SECTION("RA iterator"){
-        array_sequence<int> seq = {1, 2, 3, 4, 5, 6};
+        TestType seq = {1, 2, 3, 4, 5, 6};
         auto it = seq.begin();
         auto end = seq.end();
 

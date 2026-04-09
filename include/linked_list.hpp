@@ -232,8 +232,7 @@ std::shared_ptr<typename linked_list<T>::node> linked_list<T>::get_node(size_t i
 };
 template<class T>
 linked_list<T> linked_list<T>::get_sublist(size_t start_index, size_t end_index) const {
-    if(start_index > size_ || 
-       end_index   > size_ || 
+    if(end_index > size_ || 
        start_index > end_index) 
         throw std::out_of_range("index out of range");
 

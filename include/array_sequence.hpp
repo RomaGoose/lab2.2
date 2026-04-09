@@ -130,7 +130,16 @@ class array_sequence {
             return const_iterator(items_.begin() + count);
         }
 
-        array_sequence<T> get_subsequence(size_t i, size_t i2) const { return *this;};
+        array_sequence<T> get_subsequence(size_t start, size_t end) const {
+            if (start > end || end > size()) throw std::out_of_range("invalid range");
+            
+            array_sequence<T> tmp;
+            tmp.items_.resize(std::bit_ceil(end - start));
+            for (auto it = begin() + start; it != begin() + end; ++it) {
+                tmp.append(*it);
+            }
+            return tmp;
+        }
 };
 
 template<class T>

@@ -105,7 +105,13 @@ class list_sequence {
             return sentinel();
         }
 
-        list_sequence<T> get_subsequence(size_t i, size_t i2) const { return *this;};
+        list_sequence<T> get_subsequence(size_t start, size_t end) const {
+            list_sequence<T> tmp;
+            for(auto el: items_.get_sublist(start, end)){
+                tmp.append(el);
+            }
+            return tmp;
+        }
 };
 
 
