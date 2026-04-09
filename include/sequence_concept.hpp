@@ -1,12 +1,15 @@
+#pragma once
+
 #include <concepts>
 #include <cstddef>
 #include <iterator>
 #include <utility>
-template<class Seq, class T>
-concept Sequence = requires (Seq s, const Seq& cs, size_t i, size_t end, size_t start, T item) {
-    { s.at(i) } -> std::same_as<T&>;
-    { s.first(i) } -> std::same_as<T&>;
-    { s.last(i) } -> std::same_as<T&>;
+
+template<class Seq>
+concept sequence = requires (Seq s, const Seq& cs, size_t i, size_t end, size_t start, typename Seq::value_type item) {
+    { s.at(i) } -> std::same_as<typename Seq::value_type&>;
+    { s.first() } -> std::same_as<typename Seq::value_type&>;
+    { s.last() } -> std::same_as<typename Seq::value_type&>;
     { s.append(item) };
     { s.prepend(item) };
     { s.insert_at(i, item) };
@@ -16,11 +19,11 @@ concept Sequence = requires (Seq s, const Seq& cs, size_t i, size_t end, size_t 
     { s.begin() } -> std::forward_iterator;
     { s.end() } -> std::sentinel_for<decltype(s.begin())>;
     
-    { cs.at(i) } -> std::same_as<const T&>;
-    { cs.first(i) } -> std::same_as<const T&>;
-    { cs.last(i) } -> std::same_as<const T&>;
+    { cs.at(i) } -> std::same_as<const typename Seq::value_type&>;
+    { cs.first() } -> std::same_as<const typename Seq::value_type&>;
+    { cs.last() } -> std::same_as<const typename Seq::value_type&>;
     { cs.cbegin() } -> std::forward_iterator;
-    { cs.cend() } -> std::sentinel_for<decltype(s.begin())>;
+    { cs.cend() } -> std::sentinel_for<decltype(cs.begin())>;
     
     { cs.size() } -> std::same_as<size_t>;
     { cs.get_subsequence(start, end) } -> std::same_as<Seq>;
