@@ -27,6 +27,9 @@ add_executable(tests
     tests/sequence_test.cpp
 )
 
+target_compile_options(tests PRIVATE -fsanitize=address,undefined)
+target_link_options(tests PRIVATE -fsanitize=address,undefined)
+
 target_include_directories(tests PRIVATE
     ${PROJECT_SOURCE_DIR}/include
 )

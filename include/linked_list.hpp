@@ -83,10 +83,10 @@ class linked_list<T>::base_iterator{
         reference operator*() const {
             return ptr.lock()->value;
         }
-        friend bool operator!=(const base_iterator<is_const>& it, sentinel s){
-            return it.ptr.lock() != nullptr;
+        friend bool operator==(const base_iterator<is_const>& it, sentinel s){
+            return it.ptr.lock() == nullptr;
         }
-        bool operator==(const base_iterator<is_const>& other){
+        bool operator==(const base_iterator<is_const>& other) const {
             return ptr.lock() != other.ptr.lock(); 
         }
 };
@@ -117,9 +117,9 @@ linked_list<T>::sentinel linked_list<T>::cend() const {
 template<class T> 
 linked_list<T>::linked_list() : size_(0){};
 template<class T> 
-linked_list<T>::linked_list(T* items, size_t siz) : size_(0) {
-    for(; siz > 0; --siz){
-        prepend(items[siz - 1]);
+linked_list<T>::linked_list(T* items, size_t size) : size_(0) {
+    for(; size > 0; --size){
+        prepend(items[size - 1]);
     }
 };
 template<class T> 

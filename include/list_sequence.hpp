@@ -114,7 +114,7 @@ class list_sequence {
 
 template<class T>
 struct list_sequence<T>::sentinel {
-    linked_list<T>::sentinel sen_inner;
+        linked_list<T>::sentinel sen_inner;
     public:
         sentinel() : sen_inner() {};
 };
@@ -146,8 +146,8 @@ class list_sequence<T>::base_iterator{
         reference operator*() const {
             return *it_inner;
         }
-        friend bool operator!=(const base_iterator<is_const>& it, sentinel s){
-            return it.it_inner != s.sen_inner;
+        friend bool operator==(const base_iterator<is_const>& it, sentinel s){
+            return it.it_inner == s.sen_inner;
         }
         friend bool operator==(const base_iterator<is_const>& it1, const base_iterator<is_const>& it2){
             return it1.it_inner == it2.it_inner;

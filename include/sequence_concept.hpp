@@ -4,6 +4,9 @@
 
 template<class Seq>
 concept sequence = requires (Seq s, const Seq& cs, size_t i, size_t end, size_t start, typename Seq::value_type item) {
+    typename Seq::iterator;
+    typename Seq::const_iterator;
+    
     { s.at(i) } -> std::same_as<typename Seq::value_type&>;
     { s.first() } -> std::same_as<typename Seq::value_type&>;
     { s.last() } -> std::same_as<typename Seq::value_type&>;

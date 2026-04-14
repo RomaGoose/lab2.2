@@ -173,7 +173,7 @@ TEST_CASE("linked_list concat operators", "[linked_list]"){
     int arr_expect[] = {1,2,3,4,5};
 
     linked_list<int> list1(arr1, 3);
-    linked_list<int> list2(arr2, 3);
+    linked_list<int> list2(arr2, 2);
 
     SECTION("operator+"){
         SECTION("with empty"){

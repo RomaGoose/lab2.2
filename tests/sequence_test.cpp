@@ -3,8 +3,9 @@
 
 #include "list_sequence.hpp"
 #include "array_sequence.hpp"
-#include "sequence_concept.hpp"
-
+#include "concat.hpp"
+#include <cstddef>
+#include <initializer_list>
 
 // #include <ostream>
 
@@ -18,9 +19,13 @@
 // }
 
 
-template<sequence Seq>
+// template<range Seq,range Seq2>
+// static bool operator==(const Seq& seq, const Seq2& arr) {
+//     if (arr.size() != seq.size()) return false;
+//     return std::equal(arr.begin(), arr.end(), seq.begin());
+// }
+template<range Seq>
 static bool operator==(Seq& seq, std::initializer_list<typename Seq::value_type> arr) {
-    if (arr.size() != seq.size()) return false;
     return std::equal(arr.begin(), arr.end(), seq.begin());
 }
 
@@ -374,4 +379,28 @@ TEMPLATE_TEST_CASE("array_seq specific", "[arr_seq]",
             CHECK(end - seq.size() == it);
         }
     }
+}
+
+TEST_CASE("concat"){
+    list_sequence<size_t> l = {1,2,3};
+    array_sequence<size_t> ll = {4,5,6};
+    list_sequence<size_t> lll = {7,8,9};
+    array_sequence<size_t> llll = {10,11,12};
+    
+    auto c0 = lll + llll;
+    auto c = l + ll + c0;
+    
+    size_t i = 1;
+    for(auto el: c){
+        CHECK(el == i++);
+        REQUIRE(i < 15);
+    }
+}
+
+TEST_CASE("views") {
+    array_sequence<int> arseq = {1,2,3,4};
+
+    view_of<array_sequence<int>> v(arseq);
+
+    CHECK((v == std::initializer_list<int>{1,2,3,4}));
 }
