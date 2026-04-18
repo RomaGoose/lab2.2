@@ -1,8 +1,10 @@
+#pragma once
+
 #include <iterator>
 
 template<class Range>
-concept range = requires(Range r) {
-    typename Range::value_type;
+concept range = requires(std::remove_cvref_t<Range> r) {
+    typename std::remove_reference_t<Range>::value_type;
     
     { r.begin() } -> std::forward_iterator;
     { r.end() } -> std::sentinel_for<decltype(r.begin())>;
@@ -17,6 +19,9 @@ template<class View>
 concept view = range<View> && is_view<View>;
 
 
+template<class T, class ...Args>
+concept all_same_value_types = (std::same_as<typename std::remove_reference_t<T>::value_type, 
+                                             typename std::remove_reference_t<Args>::value_type> && ...);
 
 template<range R>
 class view_of {
@@ -27,7 +32,7 @@ class view_of {
         iter_t beg;
         sent_t sen;
     public:
-        using is_view = void;
+        using is_view_ = void;
         using value_type = R::value_type;
 
         view_of(const R& range) : beg(range.begin()), sen(range.end()) {};

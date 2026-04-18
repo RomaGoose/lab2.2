@@ -1,3 +1,5 @@
+#pragma once
+
 #include "view.hpp"
 #include <type_traits>
 #include <utility>
@@ -35,6 +37,7 @@ struct concat_view<R1, R2>::sentinel{
         using view2_t = std::conditional_t<is_view<R2>, R2, view_of<R2>>;
 
         using sen2 = decltype(std::declval<view2_t>().end());
+
         sen2 end2;
     public:
         sentinel(view2_t range2) : end2(range2.end()) {};

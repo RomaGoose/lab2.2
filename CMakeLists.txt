@@ -25,6 +25,7 @@ add_executable(tests
     tests/dyn_arr_test.cpp
     tests/linked_list_test.cpp
     tests/sequence_test.cpp
+    tests/views_test.cpp
 )
 
 target_compile_options(tests PRIVATE -fsanitize=address,undefined)
