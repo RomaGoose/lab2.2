@@ -234,14 +234,38 @@ TEST_CASE("linked_list concat operators", "[linked_list]"){
     }
 }
 
-TEST_CASE("linked_list at/get_sublist/insert_at exceptions", "[linked_list]"){
+TEST_CASE("linked_list access exceptions", "[linked_list]"){
     int arr[] = {1,2,3};
     linked_list<int> list(arr, 3);
+    linked_list<int> empty;
+    const auto& cref = list;
+    const auto& cref_empty = empty;
 
+    
     SECTION("at out_of_range"){
         CHECK_THROWS(list.at(3));
         CHECK_THROWS(list.at(-1));
     }
+    SECTION("first out_of_range"){
+        CHECK_THROWS(empty.first());
+    }
+    SECTION("last out_of_range"){
+        CHECK_THROWS(empty.first());
+    }
+
+    SECTION("const access"){
+        SECTION("cosnt at out_of_range"){
+            CHECK_THROWS(cref.at(3));
+            CHECK_THROWS(cref.at(-1));
+        }
+        SECTION("const first out_of_range"){
+            CHECK_THROWS(cref_empty.first());
+        }
+        SECTION("const last out_of_range"){
+            CHECK_THROWS(cref_empty.last());
+        }
+    }
+
 
     SECTION("insert_at out_of_range"){
         CHECK_THROWS(list.insert_at(4, 3));

@@ -98,11 +98,11 @@ linked_list<T>::iterator linked_list<T>::begin() {
 };
 template<class T> 
 linked_list<T>::const_iterator linked_list<T>::begin() const {
-    return const_iterator(head);
+    return cbegin();
 };
 template<class T> 
 linked_list<T>::sentinel linked_list<T>::end() const {
-    return {};
+    return cend();
 };
 template<class T> 
 linked_list<T>::const_iterator linked_list<T>::cbegin() const{

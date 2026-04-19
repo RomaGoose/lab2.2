@@ -110,10 +110,10 @@ class array_sequence {
             return iterator(items_.begin() + count);
         }
         const_iterator begin() const {
-            return const_iterator(items_.cbegin());
+            return cbegin();
         }
         const_iterator end() const {
-            return const_iterator(items_.begin() + count);
+            return cend();
         }
         const_iterator cbegin() const {
             return const_iterator(items_.cbegin());
@@ -138,14 +138,16 @@ template<class T>
 template<bool is_const>
 class array_sequence<T>::base_iterator{
     private: 
-        dynamic_array<T>::template base_iterator<is_const> it_inner;
+        using iter = dynamic_array<T>::template base_iterator<is_const>;
+        
+        iter it_inner;
     public:
         using reference = std::conditional_t<is_const, const T&, T&>;
         using difference_type = ptrdiff_t;
         using value_type = T;
         using iterator_category = std::random_access_iterator_tag;
 
-        base_iterator(auto it) : it_inner(it) {};
+        base_iterator(iter it) : it_inner(it) {};
         base_iterator() : it_inner() {};
 
         base_iterator& operator++(){

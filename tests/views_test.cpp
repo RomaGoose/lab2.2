@@ -1,15 +1,18 @@
 #include "catch2/catch_test_macros.hpp"
+#include "catch2/catch_template_test_macros.hpp"
 
 #include "list_sequence.hpp"
 #include "array_sequence.hpp"
 #include "concat.hpp"
+#include "map.hpp"
 #include <algorithm>
 #include <iterator>
+#include <string>
 
+using std::ranges::equal;
+using std::ranges::distance;
 
-TEST_CASE("concat_view"){
-    using std::ranges::equal;
-    using std::ranges::distance;
+TEST_CASE("concat_view", "[view]"){
 
     array_sequence<int> arr1 = {1,2,3,4};
     array_sequence<int> arr2 = {5,6,7,8};
@@ -136,5 +139,56 @@ TEST_CASE("concat_view"){
             CHECK(equal(c1, expected));
             CHECK(equal(c2, expected));
         }
+    }
+}
+
+TEMPLATE_TEST_CASE("map_view", "[view]", array_sequence<int>, list_sequence<int>) {
+    TestType seq = {1,2,3,4,5};
+    const auto& cref = seq;
+
+    auto square = [](int x){ return x * x; };
+    auto add_2 = [](int x){ return x + 2; };
+    auto to_str = [](int x){ return std::to_string(x); };
+    
+    int exp_sqr[] = {1,4,9,16,25};
+    std::string strr[] = {"1","2","3","4","5"};
+
+    
+    SECTION("basic functionality"){
+        SECTION("T -> T"){
+            auto m = seq | map(square);
+            auto m2 = cref | map(square);
+            
+            CHECK(equal(m, exp_sqr));
+            CHECK(equal(m2, exp_sqr));
+        }
+        SECTION("T -> U"){
+            auto m = cref | map(to_str);
+            auto m2 = cref | map(to_str);
+            
+            CHECK(equal(m, strr));
+            CHECK(equal(m2, strr));
+        }
+    }
+
+    SECTION("empty sequence") {
+        array_sequence<int> empty_arr;
+        list_sequence<int> empty_lst;
+
+        auto m1 = empty_arr | map(square);
+        auto m2 = empty_lst | map(square);
+
+        CHECK(m1.begin() == m1.end());
+        CHECK(m2.begin() == m2.end());
+    }
+
+    SECTION("chaining") {
+        auto m = seq | map(square)
+                     | map(add_2)
+                     | map(to_str);
+        
+        std::string expected[] = {"3","6","11","18","27"};
+        
+        CHECK(equal(m, expected));
     }
 }

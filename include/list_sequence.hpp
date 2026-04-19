@@ -89,10 +89,10 @@ class list_sequence {
             return iterator(items_.begin());
         }
         const_iterator begin() const {
-            return const_iterator(items_.cbegin());
+            return cbegin();
         }
         sentinel end() const {
-            return sentinel();
+            return cend();
         }
         const_iterator cbegin() const {
             return const_iterator(items_.cbegin());
@@ -124,14 +124,16 @@ template<class T>
 template<bool is_const>
 class list_sequence<T>::base_iterator{
     private: 
-        linked_list<T>::template base_iterator<is_const> it_inner;
+        using iter = linked_list<T>::template base_iterator<is_const>; 
+    
+        iter it_inner;
     public:
         using reference = std::conditional_t<is_const, const T&, T&>;
         using difference_type = ptrdiff_t;
         using value_type = T;
         using iterator_category = std::forward_iterator_tag;
 
-        base_iterator(auto it) : it_inner(it) {};
+        base_iterator(iter it) : it_inner(it) {};
         base_iterator() : it_inner() {};
 
         base_iterator& operator++(){

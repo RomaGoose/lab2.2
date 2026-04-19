@@ -1,4 +1,6 @@
 build
+build_cov
+coverage_html
 .cache
 Makefile
 todo

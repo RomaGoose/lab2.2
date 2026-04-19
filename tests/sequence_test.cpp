@@ -341,22 +341,28 @@ TEMPLATE_TEST_CASE("array_seq specific", "[arr_seq]",
         auto it = seq.begin();
         auto end = seq.end();
 
-        SECTION("operator+ and operator+=") {
+        SECTION("operator+, operator+= and operator++") {
             CHECK(*(it+2) == 3);
             CHECK(*(it+5) == 6);
             it += 2;
             CHECK(*it == 3);
-            it += 1;
+            it++;
             CHECK(*it == 4);
         }
 
-        SECTION("operator- and operator-=") {
+        SECTION("operator-, operator-= and operator--") {
             CHECK(*(end-2) == 5);
             CHECK(*(end-5) == 2);
             end -= 2;
             CHECK(*end == 5);
-            end -= 1;
+            --end;
             CHECK(*end == 4);
+        }
+
+        SECTION("operator[]"){
+            CHECK(it[3] == 4);
+            it += 4;
+            CHECK(it[-2] == 3);
         }
 
         SECTION("difference between iterators") {
@@ -365,7 +371,7 @@ TEMPLATE_TEST_CASE("array_seq specific", "[arr_seq]",
             CHECK((it - end) == -6);
         }
 
-        SECTION("relational operators") {
+        SECTION("comparison") {
             auto it2 = it + 2;
             CHECK(it < it2);
             CHECK(it2 > it);
