@@ -36,7 +36,6 @@ class map_view{
 
                 map_iterator(iter it_inner, Func func) : it_inner(it_inner), func(func) {}; 
 
-                // using reference = typename iter::reference;
                 using difference_type = ptrdiff_t;        
                 using value_type = std::invoke_result_t<Func, typename V::value_type>;
                 using reference = value_type;
@@ -80,13 +79,4 @@ auto map(Func func){
         { return map_view(view, (func)); };
 }
 
-template<view V, typename Func>
-auto operator|(V view, Func applicator) -> decltype(applicator(view)){
-    return applicator(view);
-}
-template<range R, typename Func>
-requires (!is_view<R>)
-auto operator|(const R& range, Func applicator) -> decltype(view_of(range)|(applicator)) {
-    return view_of(range)|(applicator);
-}
 

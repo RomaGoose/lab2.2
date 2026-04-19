@@ -5,6 +5,7 @@
 #include "array_sequence.hpp"
 #include "concat.hpp"
 #include "map.hpp"
+#include "filter.hpp"
 #include <algorithm>
 #include <iterator>
 #include <string>
@@ -143,7 +144,8 @@ TEST_CASE("concat_view", "[view]"){
 }
 
 TEMPLATE_TEST_CASE("map_view", "[view]", array_sequence<int>, list_sequence<int>) {
-    TestType seq = {1,2,3,4,5};
+    TestType before_seq = {1,2,3,4,5};
+    TestType seq = before_seq;
     const auto& cref = seq;
 
     auto square = [](int x){ return x * x; };
@@ -161,6 +163,8 @@ TEMPLATE_TEST_CASE("map_view", "[view]", array_sequence<int>, list_sequence<int>
             
             CHECK(equal(m, exp_sqr));
             CHECK(equal(m2, exp_sqr));
+
+            CHECK(equal(seq, before_seq));
         }
         SECTION("T -> U"){
             auto m = cref | map(to_str);
@@ -168,6 +172,8 @@ TEMPLATE_TEST_CASE("map_view", "[view]", array_sequence<int>, list_sequence<int>
             
             CHECK(equal(m, strr));
             CHECK(equal(m2, strr));
+
+            CHECK(equal(seq, before_seq));
         }
     }
 
@@ -190,5 +196,83 @@ TEMPLATE_TEST_CASE("map_view", "[view]", array_sequence<int>, list_sequence<int>
         std::string expected[] = {"3","6","11","18","27"};
         
         CHECK(equal(m, expected));
+        CHECK(equal(seq, before_seq));
+    }
+}
+
+TEMPLATE_TEST_CASE("filter_view", "[view]", array_sequence<int>, list_sequence<int>) {
+    TestType before_seq = {1,2,3,4,5};
+    TestType seq = before_seq;
+    const auto& cref = seq;
+    TestType empty;
+    const auto& cref_empty = empty;
+
+    int exp_even[] = {2,4};
+    int exp_odd[] = {1,3,5};
+
+    auto even = [](int x) { return (x & 1) == 0; };
+    auto id = [](int x){ return 1; };
+    auto nul = [](int x){ return 0; };
+
+    auto f = seq | filter(even);
+
+    CHECK(distance(f) == 2);
+    CHECK(equal(f, exp_even));
+
+    SECTION("basic functionality"){
+        SECTION("all pass"){
+            auto f = seq | filter(id);
+            auto f1 = cref | filter(id);
+
+            CHECK(distance(f) == 5);
+            CHECK(distance(f1) == 5);
+            CHECK(equal(f, seq));
+            CHECK(equal(f1, seq));
+            CHECK(equal(seq, before_seq));
+        }
+        SECTION("none pass"){
+            auto f = seq | filter(nul);
+            auto f1 = cref | filter(nul);
+
+            CHECK(distance(f) == 0);
+            CHECK(distance(f1) == 0);
+            CHECK(equal(seq, before_seq));
+        }
+        SECTION("some pass"){
+            auto f = seq | filter(even);
+            auto f1 = cref | filter(even);
+
+            CHECK(distance(f) == 2);
+            CHECK(distance(f1) == 2);
+            CHECK(equal(f, exp_even));
+            CHECK(equal(f1, exp_even));
+            CHECK(equal(seq, before_seq));
+        }
+    }
+
+    SECTION("empty sequence"){
+        auto f = empty | filter(even);
+        auto f1 = cref_empty | filter(even);
+
+        CHECK(distance(f) == 0);
+        CHECK(distance(f1) == 0);
+    
+        CHECK(f.begin() == f.end());
+        CHECK(f1.begin() == f1.end());
+    }
+
+    SECTION("chaining"){
+        TestType big_seq = {1,2,3,4,5,6,7,8,9,10};
+
+        auto mult_of_3 = [](int x) { return x % 3 == 0; };
+
+        auto f = big_seq | filter(id)
+                         | filter(even)
+                         | filter(id)
+                         | filter(mult_of_3)
+                         | filter(id);
+
+        CHECK(distance(f) == 1);
+        CHECK(*(f.begin()) == 6);
     }
 }

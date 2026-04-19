@@ -76,3 +76,13 @@ class view_of {
             return sentinel(sen);
         }
 };
+
+template<view V, typename Func>
+auto operator|(V view, Func applicator) -> decltype(applicator(view)){
+    return applicator(view);
+}
+template<range R, typename Func>
+requires (!is_view<R>)
+auto operator|(const R& range, Func applicator) -> decltype(view_of(range)|(applicator)) {
+    return view_of(range)|(applicator);
+}
