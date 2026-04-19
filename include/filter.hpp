@@ -15,12 +15,6 @@ class filter_view{
         using value_type = typename V::value_type;
 
         struct sentinel {
-            // using sen = decltype(std::declval<V>().end());
-
-            // sen sen_inner;
-
-            // sentinel() = default;
-            // sentinel(sen sen_inner) : sen_inner(sen_inner) {};
         };
 
         class filter_iterator {
@@ -79,7 +73,6 @@ class filter_view{
 
         sentinel end() {
             return {};
-            // return sentinel(view.end());
         }
 };
 

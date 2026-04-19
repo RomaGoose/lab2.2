@@ -276,3 +276,22 @@ TEMPLATE_TEST_CASE("filter_view", "[view]", array_sequence<int>, list_sequence<i
         CHECK(*(f.begin()) == 6);
     }
 }
+
+TEMPLATE_TEST_CASE("views interaction", "[view]", array_sequence<int>, list_sequence<int>) {
+    TestType seq1 = {1,2,3,4,5};
+    TestType seq2 = {6,7,8,9,10};
+    
+    auto id = [](int x){ return 1; };
+
+    
+    auto v = (seq1 + seq2) | filter([](int x){ return 1; })
+                           | map([](int x){ return x + 10; })
+                           | filter([](int x){ return x % 3 == 0; })
+                           | map([](int x){ return x - 5; })
+                           | map([](int x){ return std::to_string(x); })
+                           | map([](std::string s){ return s.length(); });
+    
+    int exp[] = {1,2,2};
+
+    CHECK(equal(v, exp));
+}
