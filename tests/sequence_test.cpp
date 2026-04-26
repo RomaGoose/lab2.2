@@ -134,6 +134,12 @@ TEMPLATE_TEST_CASE("common sequence behaviour test", "[sequence]",
                 CHECK(seq.last() == 4);
                 CHECK(seq == std::initializer_list<type>{1, 2, 3, 4});
             }
+
+            SECTION("fold expr") {
+                seq.append(4,5,6);
+                CHECK(seq.size() == 6);
+                CHECK(seq == std::initializer_list<type>{1, 2, 3, 4, 5, 6});
+            }
         }
 
         SECTION("prepend"){
@@ -150,6 +156,12 @@ TEMPLATE_TEST_CASE("common sequence behaviour test", "[sequence]",
                 CHECK(seq.size() == 4);
                 CHECK(seq.first() == 1);
                 CHECK(seq == std::initializer_list<type>{1, 2, 3, 4});
+            }
+
+            SECTION("fold expr") {
+                seq.prepend(4,5,6);
+                CHECK(seq.size() == 6);
+                CHECK(seq == std::initializer_list<type>{6, 5, 4, 1, 2, 3});
             }
         }
 
@@ -289,35 +301,60 @@ TEMPLATE_TEST_CASE("sequence move methods", "[sequence]",
                     list_sequence<std::string>,
                     array_sequence<std::string>) {
     TestType empty_str;
+    std::string s = "hello";
+    std::string s2 = "hello2";
+    std::string s3 = "hello3";
 
     SECTION("append"){
-        SECTION("with move") {
-            std::string s = "hello";
-            empty_str.append(std::move(s));
-            CHECK(empty_str.size() == 1);
-            CHECK(empty_str.first() == "hello");
-            CHECK(s.empty());  
-            CHECK(s == "");  
-        }
+        empty_str.append(std::move(s));
+        CHECK(empty_str.size() == 1);
+        CHECK(empty_str.first() == "hello");
+        CHECK(s.empty());  
+        CHECK(s == "");  
     }
 
     SECTION("prepend"){
-        SECTION("with move") {
-            std::string s = "hello";
-            empty_str.prepend(std::move(s));
-            CHECK(empty_str.size() == 1);
-            CHECK(empty_str.first() == "hello");
-            CHECK(s.empty());  
-        }
+        empty_str.prepend(std::move(s));
+        CHECK(empty_str.size() == 1);
+        CHECK(empty_str.first() == "hello");
+        CHECK(s.empty());  
     }
 
     SECTION("insert"){
-        SECTION("with move") {
-            std::string s = "hello";
-            empty_str.insert_at(0, std::move(s));
-            CHECK(empty_str.size() == 1);
-            CHECK(empty_str.first() == "hello");
+        empty_str.insert_at(0, std::move(s));
+        CHECK(empty_str.size() == 1);
+        CHECK(empty_str.first() == "hello");
+        CHECK(s.empty());  
+    }
+
+    SECTION("variadic move methods"){
+        empty_str.append("initial");
+    
+        SECTION("append"){
+            empty_str.append(std::move(s), s2, std::move(s3));
+
             CHECK(s.empty());  
+            CHECK(!s2.empty());  
+            CHECK(s3.empty());  
+
+            CHECK(empty_str.size() == 4);
+            CHECK(empty_str[0] == "initial");
+            CHECK(empty_str[1] == "hello");
+            CHECK(empty_str[2] == "hello2");
+            CHECK(empty_str[3] == "hello3");
+        }
+        SECTION("prepend"){
+            empty_str.prepend(std::move(s), s2, std::move(s3));
+
+            CHECK(s.empty());  
+            CHECK(!s2.empty());  
+            CHECK(s3.empty());  
+
+            CHECK(empty_str.size() == 4);
+            CHECK(empty_str[0] == "hello3");
+            CHECK(empty_str[1] == "hello2");
+            CHECK(empty_str[2] == "hello");
+            CHECK(empty_str[3] == "initial");
         }
     }
 }

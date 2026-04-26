@@ -284,14 +284,16 @@ TEMPLATE_TEST_CASE("views interaction", "[view]", array_sequence<int>, list_sequ
     auto id = [](int x){ return 1; };
 
     
-    auto v = (seq1 + seq2) | filter([](int x){ return 1; })
-                           | map([](int x){ return x + 10; })
-                           | filter([](int x){ return x % 3 == 0; })
-                           | map([](int x){ return x - 5; })
-                           | map([](int x){ return std::to_string(x); })
-                           | map([](std::string s){ return s.length(); });
+    auto v = (((seq1 + seq2) | filter([](int x){ return 1; })
+                             | map([](int x){ return x + 10; })
+                             | filter([](int x){ return x % 3 == 0; })
+                             | map([](int x){ return x - 5; }))
+                             + seq1
+                             | map([](int x){ return std::to_string(x); })
+                             | map([](std::string s){ return (int)s.length(); }))
+                             + seq2;
     
-    int exp[] = {1,2,2};
+    int exp[] = {1,2,2,1,1,1,1,1,6,7,8,9,10};
 
     CHECK(equal(v, exp));
 }

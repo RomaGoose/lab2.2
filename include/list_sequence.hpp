@@ -71,11 +71,25 @@ class list_sequence {
             items_.append(std::forward<U>(item));
             return *this;
         }
+
+        
+        template<class ...Args>
+        list_sequence<T>& append(Args&& ...args){
+            (append(std::forward<Args>(args)), ...);
+            return *this;
+        }
+
         template<class U>
         list_sequence<T>& prepend(U&& item) {
             items_.prepend(std::forward<U>(item));
             return *this;
         }
+        template<class ...Args>
+        list_sequence<T>& prepend(Args&& ...args){
+            (prepend(std::forward<Args>(args)), ...);
+            return *this;
+        }
+
         template<class U>
         list_sequence<T>& insert_at(size_t index, U&& item) {
             items_.insert_at(index, std::forward<U>(item));

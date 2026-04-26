@@ -76,6 +76,13 @@ class array_sequence {
             return *this;
         }
         
+        template<class ...Args>
+        array_sequence<T>& append(Args&& ...args){
+            (append(std::forward<Args>(args)), ...);
+            return *this;
+        }
+
+
         template<class U>
         array_sequence<T>& prepend(U&& item) {
             if(count == items_.size())
@@ -86,6 +93,13 @@ class array_sequence {
             ++count;
             return *this;
         }
+
+        template<class ...Args>
+        array_sequence<T>& prepend(Args&& ...args){
+            (prepend(std::forward<Args>(args)), ...);
+            return *this;
+        }
+        
         
         template<class U>
         array_sequence<T>& insert_at(size_t index, U&& item) {
