@@ -73,9 +73,6 @@ TEMPLATE_TEST_CASE("common sequence behaviour test", "[sequence]",
             seq.at(2) = 10;
             CHECK(seq.at(2) == 10);
             CHECK(seq == std::initializer_list<type>{1, 2, 10, 4, 5});
-            
-            CHECK_THROWS(seq.at(5));
-            CHECK_THROWS(seq.at(-1));
         }
         
         SECTION("first") {

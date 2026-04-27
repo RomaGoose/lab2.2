@@ -6,7 +6,7 @@ template<class T>
 class array_sequence {
     private:
         dynamic_array<T> items_;
-        size_t count;
+        size_t size_;
     public:
         
         template<bool is_const>
@@ -17,11 +17,11 @@ class array_sequence {
 
     
         using value_type = T;
+        using reference = T&;
 
 
-        array_sequence(std::initializer_list<T> new_items = {}) : count(new_items.size()), items_(){
-            items_.resize(std::bit_ceil(count));
-            std::copy_n(new_items.begin(), std::min({items_.size(), new_items.size()}), items_.begin());
+        array_sequence(std::initializer_list<T> new_items = {}) : size_(new_items.size()), items_(std::bit_ceil(new_items.size())){
+            std::copy_n(new_items.begin(), new_items.size(), items_.begin());
         }
 
         ~array_sequence() = default;
@@ -34,45 +34,45 @@ class array_sequence {
         }
 
         const T& at(size_t index) const {
-            if (index >= count) throw std::out_of_range("index out of range");
+            if (index >= size_) throw std::out_of_range("index out of range");
             return items_[index];
         }
         
         T& at(size_t index) {
-            if (index >= count) throw std::out_of_range("index out of range");
+            if (index >= size_) throw std::out_of_range("index out of range");
             return items_[index];
         }
         
         const T& first() const {
-            if (count == 0) throw std::out_of_range("index out of range");
+            if (size_ == 0) throw std::out_of_range("index out of range");
             return items_.at(0);
         }
         
         T& first() {
-            if (count == 0) throw std::out_of_range("index out of range");
+            if (size_ == 0) throw std::out_of_range("index out of range");
             return items_.at(0);
         }
         
         const T& last() const {
-            if (count == 0) throw std::out_of_range("index out of range");
-            return items_.at(count - 1);
+            if (size_ == 0) throw std::out_of_range("index out of range");
+            return items_.at(size_ - 1);
         }
         
         T& last() {
-            if (count == 0) throw std::out_of_range("index out of range");
-            return items_.at(count - 1);
+            if (size_ == 0) throw std::out_of_range("index out of range");
+            return items_.at(size_ - 1);
         }
         
         size_t size() const noexcept {
-            return count;
+            return size_;
         }
 
         template<class U>
         array_sequence<T>& append(U&& item) {
-            if (count == items_.size()) 
+            if (size_ == items_.size()) 
                 items_.resize(items_.size() * 2);
 
-            items_[count++] = std::forward<U>(item);
+            items_[size_++] = std::forward<U>(item);
             return *this;
         }
         
@@ -85,12 +85,12 @@ class array_sequence {
 
         template<class U>
         array_sequence<T>& prepend(U&& item) {
-            if(count == items_.size())
+            if(size_ == items_.size())
                 items_.resize(items_.size() * 2);
 
-            std::move_backward(items_.begin(), items_.begin() + count, items_.begin() + count + 1);
+            std::move_backward(items_.begin(), items_.begin() + size_, items_.begin() + size_ + 1);
             items_[0] = std::forward<U>(item);
-            ++count;
+            ++size_;
             return *this;
         }
 
@@ -100,28 +100,28 @@ class array_sequence {
             return *this;
         }
         
-        
+
         template<class U>
         array_sequence<T>& insert_at(size_t index, U&& item) {
-            if(index > count) throw std::out_of_range("index out of range");
-            if(count == items_.size())
+            if(index > size_) throw std::out_of_range("index out of range");
+            if(size_ == items_.size())
                 items_.resize(items_.size() * 2);
 
-            std::move_backward(items_.begin() + index, items_.begin() + count, items_.begin() + count + 1);
+            std::move_backward(items_.begin() + index, items_.begin() + size_, items_.begin() + size_ + 1);
             items_[index] = std::forward<U>(item);
-            count++;
+            size_++;
             return *this;
         }
 
         void clear() {
-            count = 0;
+            size_ = 0;
         }
 
         iterator begin() {
             return iterator(items_.begin());
         }
         iterator end() {
-            return iterator(items_.begin() + count);
+            return iterator(items_.begin() + size_);
         }
         const_iterator begin() const {
             return cbegin();
@@ -133,11 +133,11 @@ class array_sequence {
             return const_iterator(items_.cbegin());
         }
         const_iterator cend() const {
-            return const_iterator(items_.begin() + count);
+            return const_iterator(items_.begin() + size_);
         }
 
         array_sequence<T> get_subsequence(size_t start, size_t end) const {
-            if (start > end || end > size()) throw std::out_of_range("invalid range");
+            if (start > end || end > size_) throw std::out_of_range("invalid range");
             
             array_sequence<T> tmp;
             tmp.items_.resize(std::bit_ceil(end - start));
@@ -177,7 +177,7 @@ class array_sequence<T>::base_iterator{
             ++(*this);
             return tmp;
         }
-        reference operator*() const {
+        reference operator*() const { //TODO: mutable 
             return *it_inner;
         }
 

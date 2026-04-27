@@ -16,6 +16,7 @@ class list_sequence {
         using const_iterator = base_iterator<true>;
 
         using value_type = T;
+        using reference = T&;
         
 
         list_sequence(std::initializer_list<T> items = {}) : items_(items) {};

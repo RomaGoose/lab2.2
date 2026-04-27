@@ -26,6 +26,7 @@ add_executable(tests
     tests/linked_list_test.cpp
     tests/sequence_test.cpp
     tests/views_test.cpp
+    tests/bit_seq_test.cpp
 )
 
 target_compile_options(tests PRIVATE -fsanitize=address,undefined)

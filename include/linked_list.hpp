@@ -57,7 +57,7 @@ class linked_list{
 
         std::shared_ptr<node> head;
         std::weak_ptr<node> tail;
-        size_t size_;
+        size_t size_; //TODO: size ne dolzhno byt
 
         std::shared_ptr<node> get_node(size_t index);
         std::shared_ptr<node> get_node(size_t index) const;
