@@ -177,7 +177,7 @@ class array_sequence<T>::base_iterator{
             ++(*this);
             return tmp;
         }
-        reference operator*() const { //TODO: mutable 
+        reference operator*() const { 
             return *it_inner;
         }
 

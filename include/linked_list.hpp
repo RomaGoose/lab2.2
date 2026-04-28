@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cstddef>
 #include <memory>
+#include <stdexcept>
+#include <type_traits>
 
 
 template<class T>
@@ -13,7 +16,7 @@ class linked_list{
         using iterator = base_iterator<false>;
         using const_iterator = base_iterator<true>;
         
-        linked_list();
+        linked_list() = default;
         linked_list(T* items, size_t size_);
         linked_list(const linked_list<T>& other);
         linked_list(std::initializer_list<T> init_list);
@@ -57,9 +60,7 @@ class linked_list{
 
         std::shared_ptr<node> head;
         std::weak_ptr<node> tail;
-        size_t size_; //TODO: size ne dolzhno byt
-
-        std::shared_ptr<node> get_node(size_t index);
+        
         std::shared_ptr<node> get_node(size_t index) const;
 };
 
@@ -113,23 +114,20 @@ linked_list<T>::sentinel linked_list<T>::cend() const {
     return {};
 };
 
-
 template<class T> 
-linked_list<T>::linked_list() : size_(0){};
-template<class T> 
-linked_list<T>::linked_list(T* items, size_t size) : size_(0) {
+linked_list<T>::linked_list(T* items, size_t size){
     for(; size > 0; --size){
         prepend(items[size - 1]);
     }
 };
 template<class T> 
-linked_list<T>::linked_list(const linked_list<T>& other) : size_(0){
+linked_list<T>::linked_list(const linked_list<T>& other){
     for(const auto& el: other){
         append(el);
     }
 };
 template<class T> 
-linked_list<T>::linked_list(std::initializer_list<T> init_list) : size_(0){
+linked_list<T>::linked_list(std::initializer_list<T> init_list){
     for(auto el: init_list){
         append(el);
     }
@@ -141,7 +139,7 @@ template<class T>
 template<class U> 
 void linked_list<T>::append(U&& item) {
     auto new_node = std::make_shared<node>(std::forward<U>(item));
-    if (size_ == 0){
+    if (head.get() == nullptr){
         head = new_node;
         tail = new_node;
     }
@@ -151,13 +149,12 @@ void linked_list<T>::append(U&& item) {
         temp->next = new_node;
         tail = new_node;
     }
-    ++size_;
 }
 template<class T> 
 template<class U> 
 void linked_list<T>::prepend(U&& item){
     auto new_node = std::make_shared<node>(std::forward<U>(item));
-    if (size_ == 0){
+    if (head.get() == nullptr){
         head = new_node;
         tail = new_node;
     }
@@ -166,40 +163,38 @@ void linked_list<T>::prepend(U&& item){
         new_node->next = head;
         head = new_node;
     }
-    ++size_;
 };
 template<class T> 
 template<class U> 
 void linked_list<T>::insert_at(size_t index, U&& item){
-    if(index > size_) throw std::out_of_range("index out of range");
     if(index == 0) { prepend(std::forward<U>(item)); return; }
-    if(index == size_) { append(std::forward<U>(item)); return; }
+    
+    auto behind = get_node(index - 1);
+    if(behind->next == nullptr) { append(std::forward<U>(item)); return; }
+
 
     auto new_node = std::make_shared<node>(std::forward<U>(item));
-    auto behind = get_node(index - 1);
 
     new_node->next = behind->next;
     new_node->prev = behind;
 
     behind->next->prev = new_node;
     behind->next = new_node;
-    ++size_;
 };
 template<class T> 
 void linked_list<T>::clear() noexcept{
     head.reset();
     tail.reset();
-    size_ = 0;
 }
 
 template<class T> 
 size_t linked_list<T>::size() const noexcept{
-    return size_;
+    size_t count = 0;
+    for(auto it = begin(); it != end(); ++it, ++count);
+    return count;
 };
 template<class T>
 const T& linked_list<T>::at(size_t index) const{
-    if(index >= size_) 
-        throw std::out_of_range("index out of range");
     return get_node(index)->value;
 };
 template<class T>
@@ -216,8 +211,6 @@ const T& linked_list<T>::last() const{
 };
 template<class T>
 T& linked_list<T>::at(size_t index) {
-    if(index >= size_) 
-        throw std::out_of_range("index out of range");
     return get_node(index)->value;
 };
 template<class T>
@@ -234,38 +227,36 @@ T& linked_list<T>::last() {
 };
 
 template<class T>
-std::shared_ptr<typename linked_list<T>::node> linked_list<T>::get_node(size_t index) {
-    if (index >= size_) throw std::out_of_range("index out of range");
+std::shared_ptr<typename linked_list<T>::node> linked_list<T>::get_node(size_t index) const {
     if (index == 0) return head;
 
     node* cur = head.get();
-    for(; index > 1; --index) 
+    for(; index > 1; --index) {
         cur = cur->next.get();
+        if(cur->next == nullptr) throw std::out_of_range("index out of range");
+    }
+    
     return cur->next;
 };
-template<class T>
-std::shared_ptr<typename linked_list<T>::node> linked_list<T>::get_node(size_t index) const{
-    if (index >= size_) throw std::out_of_range("index out of range");
-    if (index == 0) return head;
 
-    node* cur = head.get();
-    for(; index > 1; --index) 
-        cur = cur->next.get();
-    return cur->next;
-};
 template<class T>
 linked_list<T> linked_list<T>::get_sublist(size_t start_index, size_t end_index) const {
-    if(end_index > size_ || 
-       start_index > end_index) 
-        throw std::out_of_range("index out of range");
-
     linked_list<T> sub;
+    size_t count = 0;
     size_t i = 0;
+
     for (const auto& el: *this){
-        if(i == end_index) return sub;
+        if(i == end_index) {
+            if(count != end_index - start_index) throw std::out_of_range("index out of range");
+            return sub;
+        }
         if(i++ < start_index) continue;
+    
         sub.append(el);
+        ++count;
     }
+    
+    if(count != end_index - start_index) throw std::out_of_range("index out of range");
     return sub;
 };
 

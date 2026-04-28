@@ -1,11 +1,14 @@
 #pragma once
 
 #include "linked_list.hpp"
+#include <cstddef>
 
 template<typename  T>
 class list_sequence {
     private:
         linked_list<T> items_;
+
+        size_t size_;
     public:
         
         template<bool is_const>
@@ -19,7 +22,7 @@ class list_sequence {
         using reference = T&;
         
 
-        list_sequence(std::initializer_list<T> items = {}) : items_(items) {};
+        list_sequence(std::initializer_list<T> items = {}) : items_(items), size_(items.size()) {};
 
         ~list_sequence() = default;
 
@@ -64,12 +67,13 @@ class list_sequence {
         }
         
         size_t size() const noexcept {
-            return items_.size();
+            return size_;
         }
 
         template<class U>
         list_sequence<T>& append(U&& item) {
             items_.append(std::forward<U>(item));
+            ++size_;
             return *this;
         }
 
@@ -83,6 +87,7 @@ class list_sequence {
         template<class U>
         list_sequence<T>& prepend(U&& item) {
             items_.prepend(std::forward<U>(item));
+            ++size_;
             return *this;
         }
         template<class ...Args>
@@ -94,10 +99,11 @@ class list_sequence {
         template<class U>
         list_sequence<T>& insert_at(size_t index, U&& item) {
             items_.insert_at(index, std::forward<U>(item));
+            ++size_;
             return *this;
         }
 
-        void clear() { items_.clear(); }
+        void clear() { items_.clear(); size_ = 0; }
 
 
         iterator begin() {
