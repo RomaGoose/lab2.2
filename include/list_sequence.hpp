@@ -50,6 +50,16 @@ class list_sequence {
             return items_.at(index);
         }
         
+        T pop_first() noexcept {
+            --size_;
+            return items_.pop_first();
+        }
+        
+        T pop_last() noexcept {
+            --size_;
+            return items_.pop_last();
+        }
+
         const T& first() const {
             return items_.first();
         }
