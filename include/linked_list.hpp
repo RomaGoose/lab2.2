@@ -29,6 +29,8 @@ class linked_list{
         
         
 
+        T pop_first() noexcept;
+        T pop_last() noexcept;
         const T& first() const;
         const T& last() const;
         const T& at(size_t index) const;
@@ -60,7 +62,7 @@ class linked_list{
 
         std::shared_ptr<node> head;
         std::weak_ptr<node> tail;
-        
+
         std::shared_ptr<node> get_node(size_t index) const;
 };
 
@@ -196,6 +198,19 @@ size_t linked_list<T>::size() const noexcept{
 template<class T>
 const T& linked_list<T>::at(size_t index) const{
     return get_node(index)->value;
+};
+template<class T>
+T linked_list<T>::pop_first() noexcept{
+    T tmp = head->value;
+    head = head->next;
+    return tmp;
+};
+template<class T>
+T linked_list<T>::pop_last() noexcept{
+    T tmp = tail.lock()->value;
+    tail = tail.lock()->prev;
+    tail.lock()->next.reset();
+    return tmp;
 };
 template<class T>
 const T& linked_list<T>::first() const{
