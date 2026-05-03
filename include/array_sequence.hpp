@@ -44,15 +44,13 @@ class array_sequence {
             return items_[index];
         }
         
-        T pop_first() noexcept {
+        void pop_first() noexcept {
             --size_;
-            T tmp = items_[0];
             std::move(items_.begin() + 1, items_.end(), items_.begin());
-            return tmp;
         }
         
-        T pop_last() noexcept {
-            return items_[--size_];
+        void pop_last() noexcept {
+            --size_;
         }
 
         const T& first() const {

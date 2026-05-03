@@ -297,16 +297,16 @@ TEMPLATE_TEST_CASE("common sequence behaviour test", "[sequence]",
         TestType seq = {1,2,3,4,5};
 
         SECTION("pop_first"){
-            CHECK(seq.pop_first() == 1);
-            CHECK(seq.pop_first() == 2);
+            seq.pop_first();
+            seq.pop_first();
             CHECK(seq.size() == 3);
             CHECK(seq.at(0) == 3);
             CHECK(seq.at(1) == 4);
             CHECK(seq.at(2) == 5);
         }
         SECTION("pop_last"){
-            CHECK(seq.pop_last() == 5);
-            CHECK(seq.pop_last() == 4);
+            seq.pop_last();
+            seq.pop_last();
             CHECK(seq.size() == 3);
             CHECK(seq.at(0) == 1);
             CHECK(seq.at(1) == 2);

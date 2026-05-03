@@ -29,8 +29,8 @@ class linked_list{
         
         
 
-        T pop_first() noexcept;
-        T pop_last() noexcept;
+        void pop_first() noexcept;
+        void pop_last() noexcept;
         const T& first() const;
         const T& last() const;
         const T& at(size_t index) const;
@@ -200,17 +200,13 @@ const T& linked_list<T>::at(size_t index) const{
     return get_node(index)->value;
 };
 template<class T>
-T linked_list<T>::pop_first() noexcept{
-    T tmp = head->value;
+void linked_list<T>::pop_first() noexcept{
     head = head->next;
-    return tmp;
 };
 template<class T>
-T linked_list<T>::pop_last() noexcept{
-    T tmp = tail.lock()->value;
+void linked_list<T>::pop_last() noexcept{
     tail = tail.lock()->prev;
     tail.lock()->next.reset();
-    return tmp;
 };
 template<class T>
 const T& linked_list<T>::first() const{

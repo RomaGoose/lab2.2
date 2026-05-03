@@ -449,19 +449,19 @@ TEST_CASE("linked_list clear", "[linked_list]"){
 }
 
 TEST_CASE("linked_list pop", "[linked_list]"){
-    linked_list<int> list = {1,2,3,4, 5};
+    linked_list<int> list = {1,2,3,4,5};
 
     SECTION("pop_first"){
-        CHECK(list.pop_first() == 1);
-        CHECK(list.pop_first() == 2);
+        list.pop_first();
+        list.pop_first();
         CHECK(list.size() == 3);
         CHECK(list.at(0) == 3);
         CHECK(list.at(1) == 4);
         CHECK(list.at(2) == 5);
     }
     SECTION("pop_last"){
-        CHECK(list.pop_last() == 5);
-        CHECK(list.pop_last() == 4);
+        list.pop_last();
+        list.pop_last();
         CHECK(list.size() == 3);
         CHECK(list.at(0) == 1);
         CHECK(list.at(1) == 2);
