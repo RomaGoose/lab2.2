@@ -201,12 +201,27 @@ const T& linked_list<T>::at(size_t index) const{
 };
 template<class T>
 void linked_list<T>::pop_first() noexcept{
-    head = head->next;
+    if(head.get() == tail.lock().get()){
+        head.reset();
+        tail.reset();
+    }
+    else{
+        head = head->next;
+        head->prev.reset();
+    }
 };
 template<class T>
 void linked_list<T>::pop_last() noexcept{
-    tail = tail.lock()->prev;
-    tail.lock()->next.reset();
+    if(head.get() == tail.lock().get()){
+        head.reset();
+        tail.reset();
+    }
+    else {
+        auto tmp = tail.lock();
+        tail = tail.lock()->prev;
+        tail.lock()->next.reset();
+        tmp.reset();
+    }
 };
 template<class T>
 const T& linked_list<T>::first() const{

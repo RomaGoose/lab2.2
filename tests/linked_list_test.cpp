@@ -467,4 +467,14 @@ TEST_CASE("linked_list pop", "[linked_list]"){
         CHECK(list.at(1) == 2);
         CHECK(list.at(2) == 3);
     }
+    SECTION("pop till empty"){
+        list.pop_first();
+        list.pop_first();
+        list.pop_last();
+        list.pop_last();
+        list.pop_first();
+        CHECK(list.size() == 0);
+        list.append(5);
+        CHECK(list.first() == 5);
+    }
 }
