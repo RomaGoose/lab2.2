@@ -1,6 +1,7 @@
 #pragma once
 
 #include "dynamic_array.hpp"
+#include <algorithm>
 
 template<class T>
 class array_sequence {
@@ -43,6 +44,17 @@ class array_sequence {
             return items_[index];
         }
         
+        T pop_first() noexcept {
+            --size_;
+            T tmp = items_[0];
+            std::move(items_.begin() + 1, items_.end(), items_.begin());
+            return tmp;
+        }
+        
+        T pop_last() noexcept {
+            return items_[--size_];
+        }
+
         const T& first() const {
             if (size_ == 0) throw std::out_of_range("index out of range");
             return items_.at(0);
