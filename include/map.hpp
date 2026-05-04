@@ -1,6 +1,7 @@
 #pragma once
 
 #include "view.hpp"
+#include <iterator>
 #include <type_traits>
 #include <utility>
 
@@ -69,10 +70,14 @@ class map_view{
         sentinel end() {
             return sentinel(view.end());
         }
+
+        bool is_empty() {
+            return begin() == end();
+        }
 };
 
 template<typename Func>
-auto map(Func func){
+auto map(Func func) {
     return 
         [func]
         <view V>(V view) 
