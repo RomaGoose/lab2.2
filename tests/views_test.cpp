@@ -198,6 +198,16 @@ TEMPLATE_TEST_CASE("map_view", "[view]", array_sequence<int>, list_sequence<int>
         CHECK(equal(m, expected));
         CHECK(equal(seq, before_seq));
     }
+    SECTION("empty chaining"){
+        list_sequence<int> empty_lst;
+
+
+        auto m = empty_lst | map(square)
+                     | map(add_2)
+                     | map(to_str);
+
+        CHECK(m.is_empty());
+    }
 }
 
 TEMPLATE_TEST_CASE("filter_view", "[view]", array_sequence<int>, list_sequence<int>) {
