@@ -12,8 +12,8 @@ concept sequence = requires (Seq s, const Seq& cs, size_t i, size_t end, size_t 
     typename Seq::reference;
 
     { s.at(i) } -> std::same_as<typename Seq::reference>;
-    { s.pop_first() } -> std::same_as<typename Seq::value_type>;
-    { s.pop_last() } -> std::same_as<typename Seq::value_type>;
+    { s.pop_first() } -> std::same_as<void>;
+    { s.pop_last() } -> std::same_as<void>;
     { s.first() } -> std::same_as<typename Seq::reference>;
     { s.last() } -> std::same_as<typename Seq::reference>;
     { s.append(item) };
