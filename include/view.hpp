@@ -35,7 +35,8 @@ class view_of {
         using is_view_ = void;
         using value_type = R::value_type;
 
-        view_of(const R& range) : beg(range.begin()), sen(range.end()) {};
+        explicit view_of(const R& range) : beg(range.begin()), sen(range.end()) {};
+        explicit view_of(R&& range) = delete;
 
 
         struct sentinel{
