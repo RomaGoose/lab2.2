@@ -123,6 +123,12 @@ class array_sequence {
             return *this;
         }
 
+        void remove_at(size_t index) {
+            if (index >= size_) throw std::out_of_range("index out of range");
+            std::move(items_.begin() + index + 1, items_.begin() + size_, items_.begin() + index);
+            --size_;
+        }
+
         void clear() {
             size_ = 0;
         }

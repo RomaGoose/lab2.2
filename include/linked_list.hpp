@@ -53,6 +53,7 @@ class linked_list{
         void prepend(U&& item);
         template<class U> 
         void insert_at(size_t index, U&& item);
+        void remove_at(size_t index);
         void clear() noexcept;
 
         linked_list<T> get_sublist(size_t start_index, size_t end_index) const;
@@ -183,6 +184,28 @@ void linked_list<T>::insert_at(size_t index, U&& item){
     behind->next->prev = new_node;
     behind->next = new_node;
 };
+template<class T>
+void linked_list<T>::remove_at(size_t index) {
+    if (head.get() == nullptr)
+        throw std::out_of_range("index out of range");
+
+    if (index == 0) {
+        pop_first();
+        return;
+    }
+
+    auto target = get_node(index);
+
+    if (target->next == nullptr) {
+        pop_last();
+        return;
+    }
+
+    auto prev = target->prev.lock();
+    auto next = target->next;
+    prev->next = next;
+    next->prev = prev;
+}
 template<class T> 
 void linked_list<T>::clear() noexcept{
     head.reset();

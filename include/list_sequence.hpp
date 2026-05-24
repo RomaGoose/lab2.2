@@ -113,6 +113,12 @@ class list_sequence {
             return *this;
         }
 
+        void remove_at(size_t index) {
+            if (index >= size_) throw std::out_of_range("index out of range");
+            items_.remove_at(index);
+            --size_;
+        }
+
         void clear() { items_.clear(); size_ = 0; }
 
 

@@ -19,6 +19,7 @@ concept sequence = requires (Seq s, const Seq& cs, size_t i, size_t end, size_t 
     { s.append(item) };
     { s.prepend(item) };
     { s.insert_at(i, item) };
+    { s.remove_at(i) } -> std::same_as<void>;
     { s.append(std::move(item)) };
     { s.prepend(std::move(item)) };
     { s.insert_at(i, std::move(item)) };

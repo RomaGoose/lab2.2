@@ -193,6 +193,29 @@ TEMPLATE_TEST_CASE("common sequence behaviour test", "[sequence]",
             
             CHECK(empty == std::initializer_list<type>{0, 1, 2, 10, 3});
         }
+
+        SECTION("remove"){
+            SECTION("at beginning") {
+                seq.remove_at(0);
+                CHECK(seq == std::initializer_list<type>{2, 3});
+            }
+
+            SECTION("at middle") {
+                seq.remove_at(1);
+                CHECK(seq == std::initializer_list<type>{1, 3});
+            }
+
+            SECTION("at end") {
+                seq.remove_at(2);
+                CHECK(seq == std::initializer_list<type>{1, 2});
+            }
+
+            SECTION("single element") {
+                TestType single = {42};
+                single.remove_at(0);
+                CHECK(single.size() == 0);
+            }
+        }
     }
     SECTION("sequence iterators", "[seq]") {
         TestType seq = {1, 2, 3, 4, 5};
@@ -250,6 +273,11 @@ TEMPLATE_TEST_CASE("common sequence behaviour test", "[sequence]",
         }
         SECTION("insert out of range") {
             CHECK_THROWS(seq.insert_at(4, 10));
+        }
+        SECTION("remove out of range") {
+            CHECK_THROWS(seq.remove_at(3));
+            CHECK_THROWS(seq.remove_at(234));
+            CHECK_THROWS(empty.remove_at(0));
         }
         SECTION("first empty") {
             CHECK_THROWS(empty.first());
